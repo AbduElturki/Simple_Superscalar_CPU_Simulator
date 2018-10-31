@@ -1,4 +1,5 @@
 import re
+import sys
 
 from table import opcode, register_aliases
 
@@ -31,9 +32,7 @@ def parse_operand(operand, labels):
         return int(operand, 16)
     else:
         return int(operand)
-
             
-
 def asm_to_machine(asm):
     label_list = []
     machine_code = []
@@ -76,4 +75,27 @@ def asm_to_machine(asm):
 
         machine_code.append(output)
     return machine_code
+
+def assembler(assembly):
+    with open(assembly) as f:
+        assembly  = f.readlines()
+        f.close()
+    return = asm_to_machine(assembly)
+
+def main():
+    if len(sys.argv) != 2:
+        print("Use: python main.py file.asm")
+    else:
+        filename = sys.argv[1].replace(".asm",".hex")
+        with open(sys.argv[1]) as f:
+            assembly  = f.readlines()
+            f.close()
+        machine_code = asm_to_machine(assembly)
+        f = open(filename,"w+")
+        for line in machine_code:
+            f.write(line+"\n")
+        f.close()
+
+if __name__ == "__main__":
+    main()
 
