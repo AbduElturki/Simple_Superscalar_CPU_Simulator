@@ -21,19 +21,19 @@ class decode_unit(object):
 
             #Type-I ALU
             if self.instruct_reg[0] in [0x02, 0x0A]:
-                r1 = "R"+op[1].replace("0","")
+                r1 = "R"+str(int(op[1],16))
                 if self.instruct_reg[0] is 0x02:
-                    self.decode = [0x00, r1, reg[r1], int(op[2]+op[3])]
+                    self.decode = [0x00, r1, reg[r1], int(op[2]+op[3], 16)]
                 elif self.instruct_reg[0] is 0x0A:
-                    self.decode = [0x01, r1, reg[r1], int(op[2]+op[3])]
+                    self.decode = [0x01, r1, reg[r1], int(op[2]+op[3], 16)]
                 else:
                     raise Exception("Tried to decode nonexistent Type I ALU opcode")
 
             #Type-R ALU
             else:
-                r1 = "R"+op[1].replace("0","")
-                r2 = "R"+op[2].replace("0","")
-                r3 = "R"+op[3].replace("0","")
+                r1 = "R"+str(int(op[1],16))
+                r2 = "R"+str(int(op[1],16))
+                r3 = "R"+str(int(op[1],16))
                 if self.instruct_reg[0] is 0x01: #ADD
                     self.decode = [0x0, r1, reg[r2], reg[r3]]
                 elif self.instruct_reg[0] is 0x03: #SUB
@@ -51,4 +51,4 @@ class decode_unit(object):
                 elif self.instruct_reg[0] is 0x09: #DIV
                     self.decode = [0x7, r1, reg[r2], reg[r3]]
                 else:
-                    raise Exception("Tried to decode nonexistent Type I ALU opcode")
+                    raise Exception("Tried to decode nonexistent Type R ALU opcode")
