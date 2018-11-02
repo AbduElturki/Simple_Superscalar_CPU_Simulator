@@ -1,1 +1,1 @@
-__all__ = ["fetch", "decode", "execute", "write_back"]
+__all__ = ["fetch", "decode", "execute", "write_back", "operation_units"]

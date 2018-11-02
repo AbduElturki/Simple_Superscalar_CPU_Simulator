@@ -1,0 +1,5 @@
+ADD R1 R2 R3
+;test
+
+
+LDI R1 32

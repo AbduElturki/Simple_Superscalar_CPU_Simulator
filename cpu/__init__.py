@@ -1,1 +1,1 @@
-__all__ = ["cpu"]
+__all__ = ["cpu", "memory"]

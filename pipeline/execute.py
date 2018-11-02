@@ -1,4 +1,6 @@
-from operation_units import *
+#from operation_units import *
+#import operation_units.alu as alu
+#import operation_units.data_transfer as data_transfer
 
 class execute_unit(object):
     def __init__(self):

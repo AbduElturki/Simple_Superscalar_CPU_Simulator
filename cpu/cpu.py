@@ -1,7 +1,14 @@
-from memory import reg
-
 class cpu(object):
-    def __init__(self, instruct, fetch_unit, decode_unit, execute_unit, write_back_unit):
+    def __init__(self, instruct, reg, fetch_unit, decode_unit, execute_unit, write_back_unit):
+        """
+        instruct: list of instruction
+        reg: registor dictonary
+        fetch_unit
+        decode_unit
+        execute_unit
+        write_back_unit
+
+        """
         self.pc = 0x00
         self.pc_next = 0x00
         self.reg = reg

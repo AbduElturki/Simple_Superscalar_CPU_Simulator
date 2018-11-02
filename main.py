@@ -1,5 +1,5 @@
 from pipeline import *
-from cpu import cpu
+from cpu import * 
 from assembler import assembler 
 
 
