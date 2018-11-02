@@ -1,13 +1,13 @@
 from operation_logic import *
 
 class execute_unit(object):
-    def __init__(self, mode, decode):
+    def __init__(self):
         alu = alu.alu_logic()
         self.buf = 0
         self.mode = "ALU"
-        self.decode = decode
+        self.decode = None 
 
-    def execute(self):
+    def execute(self, mode, decode):
         if self.mode is "ALU":
             self.alu.execute(self.decode)
             self.buf = alu.buf
