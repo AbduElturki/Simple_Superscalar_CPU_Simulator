@@ -36,8 +36,8 @@ class decode_unit(object):
             else:
 
                 r1 = "R"+str(int(op[1],16))
-                r2 = "R"+str(int(op[1],16))
-                r3 = "R"+str(int(op[1],16))
+                r2 = "R"+str(int(op[2],16))
+                r3 = "R"+str(int(op[3],16))
 
                 if self.instruct_reg[0] is 0x01: #ADD
                     self.decode = [0x0, r1, reg[r2], reg[r3]]
