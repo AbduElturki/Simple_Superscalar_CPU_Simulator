@@ -56,23 +56,23 @@ def asm_to_machine(asm):
 
     # Second pass - opcodes
     for line in asm:
-        op = [None, 0x00, 0x00, 0x00]
+        op = []
         if line.strip().startswith(";") or line.strip().endswith(':') or (len(line.strip()) is 0):
             continue
         instruct = line.replace(',','').split()
         if instruct[0] not in opcode:
             raise Exception("Line " + asm.index(line) + ", operation doesn't exist")
-        op[0] = opcode[instruct[0]]
+        op.append(opcode[instruct[0]])
 
-        if len(instruct) > 1:
-            op[1] = parse_operand(instruct[1],label_list)
-        if len(instruct) > 2:
-            op[2] = parse_operand(instruct[2],label_list)
-        if len(instruct) > 3:
-            op[3] = parse_operand(instruct[3],label_list)
-        
-        output = format(op[0],'02x') + format(op[1],'02x') + format(op[2],'02x') + format(op[3],'02x')
+        for operand in instruct[1:]:
+            op.append(parse_operand(operand,label_list))
+        if len(op) > 4 or len(op) < 3:
+            raise Exception("Error parsing line: " + line)
 
+        if len(op) is 3:
+            output = format(op[0],'02x') + format(op[1],'02x') + format(op[2],'04x')
+        else:
+            output = format(op[0],'02x') + format(op[1],'02x') + format(op[2],'02x') + format(op[3],'02x')
         machine_code.append(output)
     return machine_code
 
@@ -80,7 +80,7 @@ def assembler(assembly):
     with open(assembly) as f:
         assembly  = f.readlines()
         f.close()
-    return = asm_to_machine(assembly)
+    return asm_to_machine(assembly)
 
 def main():
     if len(sys.argv) != 2:
