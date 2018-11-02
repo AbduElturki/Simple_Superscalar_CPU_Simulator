@@ -31,9 +31,11 @@ class decode_unit(object):
 
             #Type-R ALU
             else:
+
                 r1 = "R"+str(int(op[1],16))
                 r2 = "R"+str(int(op[1],16))
                 r3 = "R"+str(int(op[1],16))
+
                 if self.instruct_reg[0] is 0x01: #ADD
                     self.decode = [0x0, r1, reg[r2], reg[r3]]
                 elif self.instruct_reg[0] is 0x03: #SUB
@@ -52,3 +54,13 @@ class decode_unit(object):
                     self.decode = [0x7, r1, reg[r2], reg[r3]]
                 else:
                     raise Exception("Tried to decode nonexistent Type R ALU opcode")
+
+        elif self.instruct_reg[0] >= 0x14:
+            self.mode = "DT"
+            r1 = "R"+str(int(op[1],16))
+            if self.instruct_reg[0] is 0x10:
+                self.decode = [0x0, r1, int(op[2]+op[3], 16)] 
+            elif self.instruct_reg[0] is 0x10:
+                self.decode = [0x0, r1, int(op[2]+op[3], 16)] 
+            elif self.instruct_reg[0] is 0x10:
+                self.decode = [0x0, r1, int(op[2]+op[3], 16)] 

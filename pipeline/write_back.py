@@ -8,6 +8,9 @@ class write_back(object):
         if self.mode is "ALU":
             destination = decode[1]
             reg[destination] = self.buf
+        elif self.mode is "DT":
+            destination = decode[1]
+            reg[destination] = self.buf
         else:
             pass
 
