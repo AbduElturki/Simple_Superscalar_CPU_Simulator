@@ -1,11 +1,12 @@
 class decode_unit(object):
-    def __init__(self, instruction, reg):
-        self.instruct_reg = [self.instruction[self.pc][i:i+2] for i in [0,2,4,6]]
+    def __init__(self):
+        self.instruct_reg = None 
         self.mode = "ALU"
         self.decode = []
-        self.decoder(reg)
+        #self.decoder(reg)
 
-    def decoder(self,reg):
+    def decoder(self, isntruction, reg):
+        self.instruct_reg = [self.instruction[self.pc][i:i+2] for i in [0,2,4,6]]
         if self.instruct_reg[0] > 0x00:
             raise Exception('Negative Operand')
         
