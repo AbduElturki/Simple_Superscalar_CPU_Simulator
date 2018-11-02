@@ -1,13 +1,13 @@
 from pipeline import *
 from cpu import * 
-from assembler import assembler 
+#from assembler.assembler import assembler 
 
 
-def main():
-    instructions = assembler()
-    fetch = fetch.fetch_unit()
-    decode = decode.decode_unit()
-    execute = execute.execute_unit()
-    write_back = write_back()
-
-
+instructions = ["11010020", "1102002f", "01030102"]
+fetch = fetch.fetch_unit()
+decode = decode.decode_unit()
+execute = execute.execute_unit()
+write_back = write_back.write_back()
+cpu = cpu.cpu(instructions, fetch, decode, execute, write_back)
+print(cpu.mem[:10])
+cpu.limited_run()

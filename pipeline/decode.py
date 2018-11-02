@@ -5,9 +5,12 @@ class decode_unit(object):
         self.decode = []
         #self.decoder(reg)
 
-    def decoder(self, isntruction, reg):
-        self.instruct_reg = [self.instruction[self.pc][i:i+2] for i in [0,2,4,6]]
-        if self.instruct_reg[0] > 0x00:
+    def decoder(self, instruction, reg):
+        print(instruction)
+        self.instruct_reg = [instruction[i:i+2] for i in [0,2,4,6]]
+        self.instruct_reg[0] = int(self.instruct_reg[0],16)
+        op = self.instruct_reg
+        if self.instruct_reg[0] < 0x00:
             raise Exception('Negative Operand')
         
         #ALU
@@ -16,9 +19,8 @@ class decode_unit(object):
         #0x02 MUL | 0x06 SHR |
         #0x03 DIV | 0x07 CMP |
 
-        elif self.instruct_reg[0] >= 0x0A:
+        elif self.instruct_reg[0] <= 0x0A:
             self.mode = "ALU"
-            op = self.instruct_reg
 
             #Type-I ALU
             if self.instruct_reg[0] in [0x02, 0x0A]:
@@ -56,12 +58,13 @@ class decode_unit(object):
                 else:
                     raise Exception("Tried to decode nonexistent Type R ALU opcode")
 
-        elif self.instruct_reg[0] >= 0x14:
+        elif self.instruct_reg[0] <= 0x14:
             self.mode = "DT"
             r1 = "R"+str(int(op[1],16))
             if self.instruct_reg[0] is 0x10:
                 self.decode = [0x0, r1, int(op[2]+op[3], 16)] 
+            elif self.instruct_reg[0] is 0x11:
+                self.decode = [0x1, r1, int(op[2]+op[3], 16)] 
             elif self.instruct_reg[0] is 0x10:
-                self.decode = [0x0, r1, int(op[2]+op[3], 16)] 
-            elif self.instruct_reg[0] is 0x10:
-                self.decode = [0x0, r1, int(op[2]+op[3], 16)] 
+                self.decode = [0x2, r1, int(op[2]+op[3], 16)] 
+        print(self.mode)

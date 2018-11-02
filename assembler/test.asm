@@ -1,5 +1,3 @@
-ADD R1 R2 R3
-;test
-
-
 LDI R1 32
+LDI R2 47
+ADD R3 R1 R2
