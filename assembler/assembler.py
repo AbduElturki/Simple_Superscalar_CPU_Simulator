@@ -1,7 +1,7 @@
 import re
 import sys
 
-from table import opcode, register_aliases
+from .table import opcode, register_aliases
 
 class label(object):
     def __init__(self, name, location):
