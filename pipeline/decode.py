@@ -19,7 +19,7 @@ class decode_unit(object):
         #0x02 MUL | 0x06 SHR |
         #0x03 DIV | 0x07 CMP |
 
-        elif self.instruct_reg[0] <= 0x0A:
+        elif self.instruct_reg[0] <= 0x0A or self.instruct_reg[0] == 0x15:
             self.mode = "ALU"
 
             #Type-I ALU
@@ -55,6 +55,8 @@ class decode_unit(object):
                     self.decode = [0x6, r1, reg[r2], reg[r3]]
                 elif self.instruct_reg[0] is 0x09: #DIV
                     self.decode = [0x7, r1, reg[r2], reg[r3]]
+                elif self.instruct_reg[0] is 0x15: #MOV
+                    self.decode = [0x0, r1, reg[r2], reg["R8"]]
                 else:
                     raise Exception("Tried to decode nonexistent Type R ALU opcode")
 
@@ -65,6 +67,6 @@ class decode_unit(object):
                 self.decode = [0x0, r1, int(op[2]+op[3], 16)] 
             elif self.instruct_reg[0] is 0x11:
                 self.decode = [0x1, r1, int(op[2]+op[3], 16)] 
-            elif self.instruct_reg[0] is 0x10:
+            elif self.instruct_reg[0] is 0x12:
                 self.decode = [0x2, r1, int(op[2]+op[3], 16)] 
         print(self.mode)

@@ -20,6 +20,7 @@ opcode = {
     "ST"  : 0x12, #Store DMEM[R1] into REG[R2]
     "STO" : 0x13, #Store offset
     "LDO" : 0x14, #Load offset
+    "MOV" : 0x15, #Move instruction
 
     "J"   : 0x20, #Jump to address in register
     "JI"  : 0x21, #Jump to immediate address
