@@ -15,7 +15,7 @@ class write_back(object):
             self.reg[destination] = buf
         elif self.mode is "DT":
             destination = decode[1]
-            reg[destination] = self.buf
+            self.reg[destination] = self.buf
         else:
             pass
 
