@@ -67,6 +67,9 @@ def asm_to_machine(asm):
         if len(op) > 4 or len(op) < 3:
             raise Exception("Error parsing line: " + line)
 
+        if len(op) is 2:
+            output = format(op[0],'02x') + format(op[1],'06x')
+
         if len(op) is 3:
             output = format(op[0],'02x') + format(op[1],'02x') + format(op[2],'04x')
         else:

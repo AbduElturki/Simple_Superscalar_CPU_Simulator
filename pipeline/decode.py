@@ -75,3 +75,27 @@ class decode_unit(object):
                 self.decode = [0x3, r1, int(op[2], 16), int(op[3], 16)]
             elif self.instruct_reg[0] is 0x14: #LDO
                 self.decode = [0x4, r1, int(op[2], 16), int(op[3], 16)]
+            else:
+                raise Exception("Tried to decode nonexistent Data Transfer instruction") 
+
+        elif self.instruct_reg[0] <= 0x27:
+            self.mode = "CF"
+            if self.instruct_reg[0] is 0x20: #J
+                self.decode = [0x0,cpu.reg[r3]]
+            elif self.instruct_reg[0] is 0x21: #JI
+                self.decode = [0x0, int(op[1]+op[2]+op[3], 16)]
+            elif self.instruct_reg[0] is 0x22: #JR
+                self.decode = [0x1, cpu.reg[r1], int(op[2]+op[3], 16)]
+            elif self.instruct_reg[0] is 0x23: #JAL
+                self.decode = [0x2, int(op[1]+op[2]+op[3], 16)]
+
+            elif self.instruct_reg[0] is 0x24:
+                self.decode = [0x3, "EGZ", cpu.reg[r1], int(op[2]+op[3], 16)]
+            elif self.instruct_reg[0] is 0x25:
+                self.decode = [0x3, "LZ", cpu.reg[r1], int(op[2]+op[3], 16)]
+            elif self.instruct_reg[0] is 0x26:
+                self.decode = [0x3, "Z", cpu.reg[r1], int(op[2]+op[3], 16)]
+            elif self.instruct_reg[0] is 0x27:
+                self.decode = [0x3, "GZ", cpu.reg[r1], int(op[2]+op[3], 16)]
+            else:
+                raise Exception("Tried to decode nonexistent Controlflow instruction") 
