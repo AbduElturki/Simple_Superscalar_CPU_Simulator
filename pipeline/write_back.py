@@ -5,17 +5,17 @@ class write_back(object):
         self.buf = None 
         self.reg = None
     
-    def write_back(self, mode, decode, buf, reg):
-        self.mode = mode
-        self.decode = decode
-        self.reg = reg
-        self.buf = buf
+    def write_back(self, cpu):
+        self.mode = cpu.decode_unit.mode
+        self.decode = cpu.decode_unit.decode
+        self.reg = cpu.reg
+        self.buf = cpu.execute_unit.buf
         if self.mode is "ALU":
-            destination = decode[1]
-            self.reg[destination] = buf
+            dest = self.decode[1]
+            cpu.update_reg(dest, self.buf)
         elif self.mode is "DT":
-            destination = decode[1]
-            self.reg[destination] = self.buf
+            dest = self.decode[1]
+            cpu.update_reg(dest, self.buf)
         else:
             pass
 

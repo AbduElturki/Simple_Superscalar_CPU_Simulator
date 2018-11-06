@@ -17,17 +17,20 @@ class cpu(object):
         self.fetch_unit = fetch_unit
         self.decode_unit = decode_unit
         self.execute_unit = execute_unit
-        self.write_back = write_back_unit
+        self.write_back_unit = write_back_unit
 
         self.running = False
 
     def update_reg(self, dest, update):
-        if update is not int:
-            raise Exception("Update isn't int")
+        #if update is not int:
+        #    raise Exception("Update isn't int")
         self.reg[dest] = update
 
     def update_pc(self, dest):
         self.pc = dest
+
+    def store(self, location, update):
+       self.mem[location] = format(update, "x08") 
 
     def pc_increment(self):
         self.pc += 1
@@ -44,6 +47,9 @@ class cpu(object):
     def execute(self):
         self.execute_unit.execute(self)
 
+    def write_back(self):
+        self.write_back_unit.write_back(self)
+
     def limited_run(self, cycles=2):
         print("Limited run of " + str(cycles) + " cycles")
         for i in range(cycles):
@@ -53,9 +59,9 @@ class cpu(object):
             self.fetch()
             self.decode()
             self.execute()
-            self.write_back.write_back(self.decode_unit.mode, self.decode_unit.decode, self.execute_unit.buf, self.reg)
+            self.write_back()
             print("------------\nAfter cycle:")
-            reg_next = dict(self.write_back.reg)
-            pprint(reg_next)
-            self.reg = dict(reg_next)
+            #reg_next = dict(self.write_back.reg)
+            pprint(self.reg)
+            #self.reg = dict(reg_next)
 

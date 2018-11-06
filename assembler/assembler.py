@@ -38,8 +38,6 @@ def asm_to_machine(asm):
     machine_code = []
     addr = 0
 
-    #iasm = comment_sanitizer(asm)
-
     # First pass - labels
     for line in asm:
         if line.strip().startswith(";") or (len(line.strip()) == 0):
