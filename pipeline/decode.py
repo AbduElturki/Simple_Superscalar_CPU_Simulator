@@ -9,9 +9,15 @@ class decode_unit(object):
         self.instruct_reg = [cpu.instruct_reg[i:i+2] for i in [0,2,4,6]]
         self.instruct_reg[0] = int(self.instruct_reg[0],16)
         op = self.instruct_reg
+
+        r1 = "R"+str(int(op[1],16))
+        r2 = "R"+str(int(op[2],16))
+        r3 = "R"+str(int(op[3],16))
+
         if self.instruct_reg[0] < 0x00:
             raise Exception('Negative Operand')
         
+
         #ALU
         #0x00 ADD | 0x04 XOR | 
         #0x01 SUB | 0x05 SHL | 
@@ -34,9 +40,6 @@ class decode_unit(object):
             #Type-R ALU
             else:
 
-                r1 = "R"+str(int(op[1],16))
-                r2 = "R"+str(int(op[2],16))
-                r3 = "R"+str(int(op[3],16))
 
                 if self.instruct_reg[0] is 0x01: #ADD
                     self.decode = [0x0, r1, cpu.reg[r2], cpu.reg[r3]]
@@ -62,9 +65,13 @@ class decode_unit(object):
         elif self.instruct_reg[0] <= 0x14:
             self.mode = "DT"
             r1 = "R"+str(int(op[1],16))
-            if self.instruct_reg[0] is 0x10:
+            if self.instruct_reg[0] is 0x10: #LD
                 self.decode = [0x0, r1, int(op[2]+op[3], 16)] 
-            elif self.instruct_reg[0] is 0x11:
+            elif self.instruct_reg[0] is 0x11: #LDI
                 self.decode = [0x1, r1, int(op[2]+op[3], 16)] 
-            elif self.instruct_reg[0] is 0x12:
+            elif self.instruct_reg[0] is 0x12: #ST
                 self.decode = [0x2, r1, int(op[2]+op[3], 16)]
+            elif self.instruct_reg[0] is 0x13: #STO
+                self.decode = [0x3, r1, int(op[2], 16), int(op[3], 16)]
+            elif self.instruct_reg[0] is 0x14: #LDO
+                self.decode = [0x4, r1, int(op[2], 16), int(op[3], 16)]
