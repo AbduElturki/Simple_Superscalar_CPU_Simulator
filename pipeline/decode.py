@@ -89,13 +89,13 @@ class decode_unit(object):
             elif self.instruct_reg[0] is 0x23: #JAL
                 self.decode = [0x2, int(op[1]+op[2]+op[3], 16)]
 
-            elif self.instruct_reg[0] is 0x24:
+            elif self.instruct_reg[0] is 0x24: #BEGZ
                 self.decode = [0x3, "EGZ", cpu.reg[r1], int(op[2]+op[3], 16)]
-            elif self.instruct_reg[0] is 0x25:
+            elif self.instruct_reg[0] is 0x25: #BLTZ
                 self.decode = [0x3, "LZ", cpu.reg[r1], int(op[2]+op[3], 16)]
-            elif self.instruct_reg[0] is 0x26:
+            elif self.instruct_reg[0] is 0x26: #BZ
                 self.decode = [0x3, "Z", cpu.reg[r1], int(op[2]+op[3], 16)]
-            elif self.instruct_reg[0] is 0x27:
+            elif self.instruct_reg[0] is 0x27: #BGZ
                 self.decode = [0x3, "GZ", cpu.reg[r1], int(op[2]+op[3], 16)]
             else:
                 raise Exception("Tried to decode nonexistent Controlflow instruction") 
