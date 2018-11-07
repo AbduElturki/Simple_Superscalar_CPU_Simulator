@@ -14,6 +14,8 @@ class write_back(object):
             dest = self.decode[1]
             cpu.update_reg(dest, self.buf)
         elif self.mode is "DT":
+            if cpu.execute_unit.data_transfer_unit.store:
+                pass
             dest = self.decode[1]
             cpu.update_reg(dest, self.buf)
         else:

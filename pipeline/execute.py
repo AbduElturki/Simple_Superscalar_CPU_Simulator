@@ -14,9 +14,9 @@ class execute_unit(object):
         if self.mode is "ALU":
             self.alu_unit.execute(self.decode)
             self.buf = self.alu_unit.buf
-        elif self.mode is "DT":
-            self.data_transfer_unit.execute(self.decode, cpu.reg, cpu.mem)
-            self.buf = self.data_transfer_unit.buf
+        elif self.mode is "DT": #ST
+            self.data_transfer_unit.execute(self.decode, cpu)
+            self.buf = self.data_transfer_unit.MBR
 
 
 
