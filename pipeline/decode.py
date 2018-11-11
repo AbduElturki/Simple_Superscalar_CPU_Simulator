@@ -1,5 +1,6 @@
 class decode_unit(object):
     def __init__(self):
+        self.busy = False
         self.instruct_reg = None 
         self.mode = "ALU"
         self.decode = []

@@ -2,6 +2,7 @@ from .operation_units import *
 
 class execute_unit(object):
     def __init__(self):
+        self.busy = False
         self.alu_unit = alu.alu_logic()
         self.data_transfer_unit = data_transfer.data_transfer()
         self.buf = 0

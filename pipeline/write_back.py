@@ -1,5 +1,6 @@
 class write_back(object):
     def __init__(self):
+        self.busy = False
         self.mode = None 
         self.decode = None 
         self.buf = None 
