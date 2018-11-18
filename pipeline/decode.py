@@ -81,6 +81,7 @@ class decode_unit(object):
 
         elif self.instruct_reg[0] <= 0x27:
             self.mode = "CF"
+            #TODO Add offsets
             if self.instruct_reg[0] is 0x20: #J
                 self.decode = [0x0,cpu.reg[r3]]
             elif self.instruct_reg[0] is 0x21: #JI

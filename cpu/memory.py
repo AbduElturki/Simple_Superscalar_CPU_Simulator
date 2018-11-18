@@ -17,3 +17,23 @@ reg = {
     "R15" : 0x00000000,
     "R99" : 0x00000000
 }
+
+score_board = {
+    "R0"  : False,
+    "R1"  : False,
+    "R2"  : False,
+    "R3"  : False,
+    "R4"  : False,
+    "R5"  : False,
+    "R6"  : False,
+    "R7"  : False,
+    "R8"  : False,
+    "R9"  : False,
+    "R10" : False,
+    "R11" : False,
+    "R12" : False,
+    "R13" : False,
+    "R14" : False,
+    "R15" : False,
+    "R99" : False
+}

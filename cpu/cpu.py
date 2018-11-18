@@ -1,4 +1,4 @@
-from .memory import reg
+from .memory import reg, score_board
 from pprint import pprint
 
 class cpu(object):
@@ -6,6 +6,7 @@ class cpu(object):
         self.pc = 0x00
 
         self.reg = reg
+        self.sb = score_board 
         self.instruct_reg = '00000000'
         self.MDR = 0x00
         self.MAR = 0x00
