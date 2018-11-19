@@ -14,11 +14,13 @@ class write_back(object):
         if self.mode is "ALU":
             dest = self.decode[1]
             cpu.update_reg(dest, self.buf)
+            cpu.sb[dest] = True
         elif self.mode is "DT":
             if cpu.execute_unit.data_transfer_unit.store:
                 pass
             dest = self.decode[1]
             cpu.update_reg(dest, self.buf)
+            cpu.sb[dest] = True
         else:
             pass
 

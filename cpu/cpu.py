@@ -59,6 +59,7 @@ class cpu(object):
             print("prior cycle")
             self.fetch()
             self.decode()
+            pprint(self.sb)
             self.execute()
             self.write_back()
             print("------------\nAfter cycle:")

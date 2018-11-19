@@ -27,7 +27,7 @@ class decode_unit(object):
 
         elif self.instruct_reg[0] <= 0x0A or self.instruct_reg[0] == 0x15:
             self.mode = "ALU"
-
+            cpu.sb[r1] = False 
             #Type-I ALU
             if self.instruct_reg[0] in [0x02, 0x0A]:
                 r1 = "R"+str(int(op[1],16))
@@ -68,20 +68,22 @@ class decode_unit(object):
             r1 = "R"+str(int(op[1],16))
             if self.instruct_reg[0] is 0x10: #LD
                 self.decode = [0x0, r1, int(op[2]+op[3], 16)] 
+                cpu.sb[r1] = False
             elif self.instruct_reg[0] is 0x11: #LDI
                 self.decode = [0x1, r1, int(op[2]+op[3], 16)] 
+                cpu.sb[r1] = False
             elif self.instruct_reg[0] is 0x12: #ST
                 self.decode = [0x2, r1, int(op[2]+op[3], 16)]
             elif self.instruct_reg[0] is 0x13: #STO
                 self.decode = [0x3, r1, int(op[2], 16), int(op[3], 16)]
             elif self.instruct_reg[0] is 0x14: #LDO
                 self.decode = [0x4, r1, int(op[2], 16), int(op[3], 16)]
+                cpu.sb[r1] = False
             else:
                 raise Exception("Tried to decode nonexistent Data Transfer instruction") 
 
         elif self.instruct_reg[0] <= 0x27:
             self.mode = "CF"
-            #TODO Add offsets
             if self.instruct_reg[0] is 0x20: #J
                 self.decode = [0x0, op[1], r2]
             elif self.instruct_reg[0] is 0x21: #JI
@@ -90,6 +92,7 @@ class decode_unit(object):
                 self.decode = [0x2, op[1]]
             elif self.instruct_reg[0] is 0x23: #JAL
                 self.decode = [0x3, op[1], r2]
+                cpu.sb[r2] = False
 
             elif self.instruct_reg[0] is 0x24: #BEGZ
                 self.decode = [0x4, "EGZ", r1, r2]

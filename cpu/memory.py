@@ -19,21 +19,21 @@ reg = {
 }
 
 score_board = {
-    "R0"  : False,
-    "R1"  : False,
-    "R2"  : False,
-    "R3"  : False,
-    "R4"  : False,
-    "R5"  : False,
-    "R6"  : False,
-    "R7"  : False,
-    "R8"  : False,
-    "R9"  : False,
-    "R10" : False,
-    "R11" : False,
-    "R12" : False,
-    "R13" : False,
-    "R14" : False,
-    "R15" : False,
-    "R99" : False
+    "R0"  : True,
+    "R1"  : True,
+    "R2"  : True,
+    "R3"  : True,
+    "R4"  : True,
+    "R5"  : True,
+    "R6"  : True,
+    "R7"  : True,
+    "R8"  : True,
+    "R9"  : True,
+    "R10" : True,
+    "R11" : True,
+    "R12" : True,
+    "R13" : True,
+    "R14" : True,
+    "R15" : True,
+    "R99" : True
 }
