@@ -49,7 +49,7 @@ class cpu(object):
         self.execute_unit.execute(self)
 
     def write_back(self):
-        self.write_back_unit.write_back(self)
+        self.write_back_unit.write_back(self, self.execute_unit.link)
 
     def limited_run(self, cycles=2):
         print("Limited run of " + str(cycles) + " cycles")
