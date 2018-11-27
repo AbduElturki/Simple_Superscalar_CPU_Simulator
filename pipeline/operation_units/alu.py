@@ -8,21 +8,22 @@ class alu_logic(object):
     def __init__(self):
         self.buf = 0
     def execute(self, cpu, decode):
-        r2 = cpu.reg[decode[2]]
-        r3 = cpu.reg[decode[3]]
-        if decode[0] is 0x00: #ADD
+        r2 = cpu.reg[decode[3]]
+        r3 = cpu.reg[decode[4]]
+        if decode[1] is 0x00: #ADD
            self.buf = r2 + r3 % 0xFFFFFFFF 
-        elif decode[0] is 0x01: #SUB
+           print(self.buf)
+        elif decode[1] is 0x01: #SUB
            self.buf = r2 - r3 % 0xFFFFFFFF 
-        elif decode[0] is 0x02: #MUL
+        elif decode[1] is 0x02: #MUL
            self.buf = r2 * r3 % 0xFFFFFFFF 
-        elif decode[0] is 0x03: #DIV
+        elif decode[1] is 0x03: #DIV
            self.buf = int(r2 / r3) % 0xFFFFFFFF 
-        elif decode[0] is 0x04: #XOR
+        elif decode[1] is 0x04: #XOR
            self.buf = r2 ^ r3 % 0xFFFFFFFF 
-        elif decode[0] is 0x05: #SHL
+        elif decode[1] is 0x05: #SHL
            self.buf = r2 << r3 % 0xFFFFFFFF 
-        elif decode[0] is 0x06: #SHR
+        elif decode[1] is 0x06: #SHR
            self.buf = r2 >> r3 % 0xFFFFFFFF 
-        elif decode[0] is 0x07: #CMP
+        elif decode[1] is 0x07: #CMP
            self.buf = int('1'*31+'0', 2) if r2 < r3 else 0 if r2 == r3 else 1
