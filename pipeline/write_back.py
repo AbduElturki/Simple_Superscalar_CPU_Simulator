@@ -23,6 +23,7 @@ class write_back(object):
         elif self.decode[0] is "CF" and link:
             dest = self.decode[2]
             cpu.update_reg(dest, self.buf)
+            cpu.sb[dest] = True
         else:
             pass
 

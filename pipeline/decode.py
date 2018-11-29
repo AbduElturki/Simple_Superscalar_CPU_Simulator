@@ -85,7 +85,7 @@ class decode_unit(object):
             elif self.instruct_reg[0] is 0x21: #JI
                 self.decode = ["CF", 0x1, op[1], op[2]]
             elif self.instruct_reg[0] is 0x22: #JR
-                self.decode = [0x2, op[1]]
+                self.decode = ["CF", 0x2, op[1]]
             elif self.instruct_reg[0] is 0x23: #JAL
                 self.decode = ["CF", 0x3, op[1], r2]
                 cpu.sb[r2] = False

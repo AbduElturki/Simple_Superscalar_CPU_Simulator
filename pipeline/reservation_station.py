@@ -4,6 +4,7 @@ class reservation_station(object):
     def __init__(self, size):
         self.size = size
         self.reservation = pd.DataFrame({'busy' : [False] * size,
+                                         'unit' : [None] * size,
                                          'opcode' : [0x00] * size,
                                          'dest' : [0x00] * size,
                                          'op_1' : [0x00] * size,
@@ -28,10 +29,18 @@ class reservation_station(object):
     def decode_to_rs(decode, cpu):
         if decode[0] is "ALU":
             if type(decode[4]) is int:
-                return [True, decode[1], decode[2], decode[3],
+                return [True, "ALU", decode[1], decode[2], decode[3],
                         cpu.sb[decode[3]], decode[4], True, 0]
             else:
-                return [True, decode[1], decode[2], decode[3],
+                return [True, "ALU", decode[1], decode[2], decode[3],
                         cpu.sb[decode[3]], decode[4], cpu.sb[decode[4]], 0]
         elif decode[0] is "DT":
-            pass
+            if decode[1] in [0x0, 0x1]:
+                return [True, "DT", decode[1], decode[2], decode[3],
+                        cpu.sb[decode[3]], 0, True, 0]
+            elif decode[1] is 0x2:
+                return [True, "DT", decode[1], decode[2], decode[3], True, 0,
+                        True, 0]
+            else:
+                return [True, "DT", decode[1], decode[2], decode[4],
+                        cpu.sb[decode[4]], 0, True, decode[4]]
