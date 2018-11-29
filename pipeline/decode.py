@@ -58,7 +58,7 @@ class decode_unit(object):
                 elif self.instruct_reg[0] is 0x09: #DIV
                     self.decode = ["ALU", 0x7, r1, r2, r3]
                 elif self.instruct_reg[0] is 0x15: #MOV
-                    self.decode = ["ALU", 0x0, r1, r2, "R8"]
+                    self.decode = ["ALU", 0x0, r1, r2, "R99"]
                 else:
                     raise Exception("Tried to decode nonexistent Type R ALU opcode")
 
@@ -85,7 +85,7 @@ class decode_unit(object):
             elif self.instruct_reg[0] is 0x21: #JI
                 self.decode = ["CF", 0x1, op[1], op[2]]
             elif self.instruct_reg[0] is 0x22: #JR
-                self.decode = ["CF", 0x2, op[1]]
+                self.decode = ["CF", 0x2, r2]
             elif self.instruct_reg[0] is 0x23: #JAL
                 self.decode = ["CF", 0x3, op[1], r2]
                 cpu.sb[r2] = False

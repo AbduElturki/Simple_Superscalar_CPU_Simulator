@@ -8,7 +8,7 @@ class control_flow(object):
         elif decode[1] is 0x1:
             cpu.pc = int(decode[1] + decode[2])
         elif decode[1] is 0x2:
-            cpu.pc += int(decode[1])
+            cpu.pc += int(cpu.reg[decode[1]])
         elif decode[1] is 0x3:
             self.link = True
             self.buf = cpu.pc #Might cause unwanted link.
