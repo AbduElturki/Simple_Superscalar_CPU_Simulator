@@ -67,7 +67,7 @@ class decode_unit(object):
                 self.decode = ["DT", 0x0, r1, r2] 
                 cpu.sb[r1] = False
             elif self.instruct_reg[0] is 0x11: #LDI
-                self.decode = ["DT", 0x1, r1, int(op[2]+op[3], 16)] 
+                self.decode = ["DT", 0x1, r1, int(op[2] + op[3], 16)] 
                 cpu.sb[r1] = False
             elif self.instruct_reg[0] is 0x12: #ST
                 self.decode = ["DT", 0x2, r1, r2]
@@ -81,13 +81,13 @@ class decode_unit(object):
 
         elif self.instruct_reg[0] <= 0x27:
             if self.instruct_reg[0] is 0x20: #J
-                self.decode = ["CF", 0x0, op[1], r2]
+                self.decode = ["CF", 0x0, r1]
             elif self.instruct_reg[0] is 0x21: #JI
-                self.decode = ["CF", 0x1, op[1], op[2]]
+                self.decode = ["CF", 0x1, int(op[2] + op[3], 16)]
             elif self.instruct_reg[0] is 0x22: #JR
                 self.decode = ["CF", 0x2, r2]
             elif self.instruct_reg[0] is 0x23: #JAL
-                self.decode = ["CF", 0x3, op[1], r2]
+                self.decode = ["CF", 0x3, r2]
                 cpu.sb[r2] = False
 
             elif self.instruct_reg[0] is 0x24: #BEGZ

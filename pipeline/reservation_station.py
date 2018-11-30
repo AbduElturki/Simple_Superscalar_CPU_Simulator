@@ -45,15 +45,11 @@ class reservation_station(object):
                 return [True, "DT", decode[1], decode[2], decode[4],
                         cpu.sb[decode[4]], 0, True, decode[4]]
         elif decode[0] is "CF":
-            if decode[1] in [0x0, 0x3]:
-                return [True, "CF", decode[1], 0, decode[3], cpu.sb[decode[3]],
-                        0, True, decode[2]]
+            if decode[1] in [0x0, 0x2, 0x3]:
+                return [True, "CF", decode[1], 0, decode[2], cpu.sb[decode[2]],
+                        0, True, 0]
             elif decode[1] is 0x1:
-                return [True, "CF", decode[1], 0, decode[3], True, 0, True,
-                        decode[2]] 
-            elif decode[1] is 0x2:
-                return [True, "CF", decode[1], 0, decode[3], cpu.sb[decode[3]],
-                        0, True, decode[2]]
+                return [True, "CF", decode[1], 0, decode[2], True, 0, True, 0]
             else:
                 return [True, "CF", decode[1], 0, decode[2], cpu.sb[decode[2]],
                         decode[3], cpu.sb[decode[3]], 0]
@@ -68,4 +64,10 @@ class reservation_station(object):
                 return ["DT", rs['opcode'], rs['dest'], rs['offset'],
                         rs['op_1']]
         elif rs['unit'] is "CF":
-            pass
+            if rs['opcode'] <= 0x3:
+                return ["CF", rs['opcode'], rs['op_1']]
+            else:
+                return ["CF", rs['opcode'], rs['op_1'], rs['op_2']]
+
+    def sb_update(cpu):
+        pass
