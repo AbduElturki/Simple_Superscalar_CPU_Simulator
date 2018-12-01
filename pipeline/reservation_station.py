@@ -17,6 +17,33 @@ class reservation_station(object):
     def is_free_space(self):
         return (self.reservation['busy'] == False).any()
 
+    def is_full(self):
+        return all(self.reservation['busy'].tolist())
+
+    def issue(self):
+        for row in range(self.size):
+            if self.reservation['busy'].iloc[row]:
+                rs = self.reservation.iloc[row]
+                if rs['valid_1'] and rs['valid_2']:
+                    decode = self.rs_to_decode(rs)
+                    self.reservation = self.reservation.drop(row).reset_index(
+                        drop=True)
+                    self.reservation = self.reservation.append(
+                        pd.DataFrame({'busy' : [False],
+                                      'unit' : [None],
+                                      'opcode' : [0x00],
+                                      'dest' : [0x00],
+                                      'op_1' : [0x00],
+                                      'valid_1' : [False],
+                                      'op_2' : [0x00],
+                                      'valid_2' : [False],
+                                      'offset' : [0x00]
+                                    }))
+                    return decode
+            else:
+                raise Exception("Stall should have occured here")
+
+    #Not Secure
     def add_instruction(self, decode, cpu):
         if not self.is_free_space():
             raise Exception("Tried to add to instruction to RS when it is not\
@@ -24,6 +51,15 @@ class reservation_station(object):
         for row in range(self.size):
             if not self.reservation['busy'].iloc[row]:
                 self.reservation.iloc[row] = decode_to_rs(decode, cpu)
+                break
+
+    def add_instruction_test(self):
+        if not self.is_free_space():
+            raise Exception("Tried to add to instruction to RS when it is not\
+                            free")
+        for row in range(self.size):
+            if not self.reservation['busy'].iloc[row]:
+                self.reservation['busy'].iloc[row] = True
                 break
 
     def decode_to_rs(decode, cpu):
@@ -69,5 +105,8 @@ class reservation_station(object):
             else:
                 return ["CF", rs['opcode'], rs['op_1'], rs['op_2']]
 
-    def sb_update(cpu):
-        pass
+    def sb_update(self, cpu):
+        self.reservation['valid_1'] = self.reservation['op_1'].apply(
+            lambda x: cpu.sb[x] if isinstance(x, str) else True)
+        self.reservation['valid_2'] = self.reservation['op_2'].apply(
+            lambda x: cpu.sb[x] if isinstance(x, str) else True)
