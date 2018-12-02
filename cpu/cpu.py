@@ -1,4 +1,5 @@
-from .memory import reg, score_board
+from .memory import reg, rat, score_board
+from .reorder_buffer import reorder_buffer
 from pprint import pprint
 
 class cpu(object):
@@ -7,6 +8,8 @@ class cpu(object):
 
         self.reg = reg
         self.sb = score_board 
+        self.rat = rat
+        self.rob = reorder_buffer(64)
         self.instruct_reg = '00000000'
         self.MDR = 0x00
         self.MAR = 0x00
@@ -22,10 +25,24 @@ class cpu(object):
 
         self.running = False
 
+    def get_dest(self, reg):
+        if reg not in self.reg:
+            raise Exception("get_dist: Register doesn't exist")
+        return self.rat[reg]
+
+    def new_dest(self, reg):
+        self.rob.issue(reg, 00, False)
+        self.rat[reg] = 'ROB' + str(self.rob.tail - 1).zfill(2)
+
     def update_reg(self, dest, update):
         #if update is not int:
         #    raise Exception("Update isn't int")
-        self.reg[dest] = update
+        if dest in self.reg:
+            self.reg[dest] = update
+        elif test[:3] is "ROB":
+            self.rob.rob['reg'].iloc[0]
+        else:
+            raise Exception("")
 
     def update_pc(self, dest):
         self.pc = dest

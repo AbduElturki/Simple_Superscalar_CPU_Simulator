@@ -10,7 +10,12 @@ class reorder_buffer(object):
         self.head = 0
         self.tail = 0
     
-    def retire(self):
+    def retire(self, cpu):
+        reg = self.rob['reg'].iloc[self.head]
+        value = self.rob['reg'].iloc[self.head]
+        cpu.reg[reg]
+        cpu.sb[reg] = True
+        cpu.rat[reg] = reg
         self.head = self.head + 1 % 64
 
     def issue(self, reg, value, valid):
