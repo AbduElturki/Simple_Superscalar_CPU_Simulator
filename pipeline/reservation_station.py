@@ -1,7 +1,7 @@
 import pandas as pd
 
 class reservation_station(object):
-    def __init__(self, size):
+    def __init__(self, size=16):
         self.size = size
         self.reservation = pd.DataFrame({'busy' : [False] * size,
                                          'unit' : [None] * size,
