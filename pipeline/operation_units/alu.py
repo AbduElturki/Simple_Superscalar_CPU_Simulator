@@ -8,8 +8,8 @@ class alu_logic(object):
     def __init__(self):
         self.buf = 0
     def execute(self, cpu, decode):
-        r2 = cpu.reg[decode[3]]
-        r3 = cpu.reg[decode[4]]
+        r2 = cpu.get_value(decode[3])
+        r3 = cpu.get_value(decode[4])
         if decode[1] is 0x00: #ADD
            self.buf = r2 + r3 % 0xFFFFFFFF 
            print(self.buf)

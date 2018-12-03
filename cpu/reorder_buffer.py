@@ -11,16 +11,21 @@ class reorder_buffer(object):
         self.tail = 0
     
     def retire(self, cpu):
-        reg = self.rob['reg'].iloc[self.head]
-        value = self.rob['reg'].iloc[self.head]
-        cpu.reg[reg]
-        cpu.sb[reg] = True
-        cpu.rat[reg] = reg
-        self.head = self.head + 1 % 64
+        if self.rob['valid'].iloc[self.head]:
+            reg = self.rob['reg'].iloc[self.head]
+            value = self.rob['reg'].iloc[self.head]
+            cpu.reg[reg]
+            cpu.sb[reg] = True
+            cpu.rat[reg] = reg
+            self.head = self.head + 1 % self.size 
 
     def issue(self, reg, value, valid):
-        self.rob.iloc[self.tail] = [reg, value, valid]
-        self.tail += self.tail + 1 % 64
+        if self.tail + 1 % self.size is self.head:
+            #TODO stall
+            pass
+        else:
+            self.rob.iloc[self.tail] = [reg, value, valid]
+            self.tail += self.tail + 1 % self.size 
     
     def get_valid(self, rob):
         self.rob['valid'].iloc[rob]

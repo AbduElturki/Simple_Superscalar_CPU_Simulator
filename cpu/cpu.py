@@ -34,13 +34,39 @@ class cpu(object):
         self.rob.issue(reg, 00, False)
         self.rat[reg] = 'ROB' + str(self.rob.tail - 1).zfill(2)
 
+    def set_valid(self, dest):
+        if dest in self.reg:
+            self.sb[dest] = True
+        elif dest[:3] is "ROB":
+            self.rob.rob['valid'].iloc[int(dest[-2:])] = True
+        else:
+            raise Exception("set_valid: dest doesn't exist")
+        pass
+
+    def get_valid(self, dest):
+        if dest in self.reg:
+            return self.sb[dest]
+        elif dest[:3] == "ROB":
+            location = int(dest[-2:])
+            return self.rob.rob['valid'].iloc[location]
+        else:
+            raise Exception("get_valid: dest doesn't exist")
+        pass
+
+    def get_value(self, dest):
+        if dest in self.reg:
+            return self.reg[dest]
+        elif dest[:3] == "ROB":
+            return self.rob.rob['value'].iloc[int(dest[-2:])]
+        else:
+            raise Exception("get_value: dest doesn't exist " + dest[:3])
+
     def update_reg(self, dest, update):
-        #if update is not int:
-        #    raise Exception("Update isn't int")
         if dest in self.reg:
             self.reg[dest] = update
-        elif test[:3] is "ROB":
-            self.rob.rob['reg'].iloc[0]
+        elif dest[:3] == "ROB":
+            location = int(dest[-2:])
+            self.rob.rob['value'].iloc[location] = update
         else:
             raise Exception("")
 

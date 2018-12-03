@@ -17,16 +17,11 @@ class decode_unit(object):
         if self.instruct_reg[0] < 0x00:
             raise Exception('Negative Operand')
         
-
-        #ALU
-        #0x00 ADD | 0x04 XOR | 
-        #0x01 SUB | 0x05 SHL | 
-        #0x02 MUL | 0x06 SHR |
-        #0x03 DIV | 0x07 CMP |
-
         elif self.instruct_reg[0] <= 0x0A or self.instruct_reg[0] == 0x15:
-            self.mode = "ALU"
-            cpu.sb[r1] = False 
+            cpu.new_dest(r1)
+            r1 = cpu.get_dest(r1)
+            r2 = cpu.get_dest(r2)
+            r3 = cpu.get_dest(r3)
             #Type-I ALU
             if self.instruct_reg[0] in [0x02, 0x0A]:
                 r1 = "R"+str(int(op[1],16))
@@ -39,7 +34,6 @@ class decode_unit(object):
 
             #Type-R ALU
             else:
-
 
                 if self.instruct_reg[0] is 0x01: #ADD
                     self.decode = ["ALU", 0x0, r1, r2, r3]
@@ -65,38 +59,57 @@ class decode_unit(object):
         elif self.instruct_reg[0] <= 0x14:
             if self.instruct_reg[0] is 0x10: #LD
                 self.decode = ["DT", 0x0, r1, r2] 
-                cpu.sb[r1] = False
+                cpu.new_dest(r1)
+                r1 = cpu.get_dest(r1)
+                r2 = cpu.get_dest(r2)
             elif self.instruct_reg[0] is 0x11: #LDI
                 self.decode = ["DT", 0x1, r1, int(op[2] + op[3], 16)] 
-                cpu.sb[r1] = False
+                cpu.new_dest(r1)
+                r1 = cpu.get_dest(r1)
             elif self.instruct_reg[0] is 0x12: #ST
                 self.decode = ["DT", 0x2, r1, r2]
+                r1 = cpu.get_dest(r1)
+                r2 = cpu.get_dest(r2)
             elif self.instruct_reg[0] is 0x13: #STO
                 self.decode = ["DT", 0x3, r1, int(op[2], 16), r3]
+                r1 = cpu.get_dest(r1)
+                r3 = cpu.get_dest(r3)
             elif self.instruct_reg[0] is 0x14: #LDO
                 self.decode = ["DT", 0x4, r1, int(op[2], 16), r3]
-                cpu.sb[r1] = False
+                cpu.new_dest(r1)
+                r1 = cpu.get_dest(r1)
+                r3 = cpu.get_dest(r3)
             else:
                 raise Exception("Tried to decode nonexistent Data Transfer instruction") 
 
         elif self.instruct_reg[0] <= 0x27:
             if self.instruct_reg[0] is 0x20: #J
+                r1 = cpu.get_dest(r1)
                 self.decode = ["CF", 0x0, r1]
             elif self.instruct_reg[0] is 0x21: #JI
                 self.decode = ["CF", 0x1, int(op[2] + op[3], 16)]
             elif self.instruct_reg[0] is 0x22: #JR
-                self.decode = ["CF", 0x2, r2]
+                r1 = cpu.get_dest(r1)
+                self.decode = ["CF", 0x2, r1]
             elif self.instruct_reg[0] is 0x23: #JAL
-                self.decode = ["CF", 0x3, r2]
-                cpu.sb[r2] = False
+                self.decode = ["CF", 0x3, r1]
+                r1 = cpu.get_dest(r1)
 
             elif self.instruct_reg[0] is 0x24: #BEGZ
                 self.decode = ["CF", 0x4, r1, r2]
+                r1 = cpu.get_dest(r1)
+                r2 = cpu.get_dest(r2)
             elif self.instruct_reg[0] is 0x25: #BLTZ
                 self.decode = ["CF", 0x5, r1, r2]
+                r1 = cpu.get_dest(r1)
+                r2 = cpu.get_dest(r2)
             elif self.instruct_reg[0] is 0x26: #BZ
                 self.decode = ["CF", 0x6, r1, r2]
+                r1 = cpu.get_dest(r1)
+                r2 = cpu.get_dest(r2)
             elif self.instruct_reg[0] is 0x27: #BGZ
                 self.decode = ["CF", 0x7, r1, r2]
+                r1 = cpu.get_dest(r1)
+                r2 = cpu.get_dest(r2)
             else:
                 raise Exception("Tried to decode nonexistent Controlflow instruction") 

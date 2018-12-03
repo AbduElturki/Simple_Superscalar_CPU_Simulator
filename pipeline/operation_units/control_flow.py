@@ -4,19 +4,19 @@ class control_flow(object):
         self.link = False
     def execute(self, decode, cpu):
         if decode[1] is 0x0:
-            cpu.pc = cpu.reg[decode[2]]
+            cpu.pc = cpu.get_value(decode[2])
         elif decode[1] is 0x1:
             cpu.pc = decode[2]
         elif decode[1] is 0x2:
-            cpu.pc += int(cpu.reg[decode[1]])
+            cpu.pc += cpu.get_value(decode[1])
         elif decode[1] is 0x3:
             self.link = True
             self.buf = cpu.pc #Might cause unwanted link.
-            cpu.pc = cpu.reg[decode[2]]
+            cpu.pc = cpu.get_value(decode[2])
 
         elif decode[1] >= 0x4:
-            r1 = cpu.reg[decode[2]]
-            r2 = cpu.reg[decode[3]]
+            r1 = cpu.get_value(decode[2])
+            r2 = cpu.get_value(decode[3])
             if decode[1] is 0x4:
                 if r1 >= 0:
                     cpu.pc = r2
