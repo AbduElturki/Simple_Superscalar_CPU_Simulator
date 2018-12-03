@@ -1,3 +1,5 @@
+import time
+
 from .memory import reg, rat, score_board
 from .reorder_buffer import reorder_buffer
 from pprint import pprint
@@ -11,9 +13,7 @@ class cpu(object):
         self.rat = rat
         self.rob = reorder_buffer(64)
         self.instruct_reg = '00000000'
-        self.MDR = 0x00
-        self.MAR = 0x00
-        self.WBR = 0x00
+        self.WBR = {} 
         
         self.mem = ['00000000'] * 1024
         self.mem[:len(instruct)] = instruct
@@ -37,7 +37,7 @@ class cpu(object):
     def set_valid(self, dest):
         if dest in self.reg:
             self.sb[dest] = True
-        elif dest[:3] is "ROB":
+        elif dest[:3] == "ROB":
             self.rob.rob['valid'].iloc[int(dest[-2:])] = True
         else:
             raise Exception("set_valid: dest doesn't exist")
@@ -66,7 +66,7 @@ class cpu(object):
             self.reg[dest] = update
         elif dest[:3] == "ROB":
             location = int(dest[-2:])
-            self.rob.rob['value'].iloc[location] = update
+            self.rob.update_value(location, update)
         else:
             raise Exception("")
 
@@ -75,6 +75,9 @@ class cpu(object):
 
     def store(self, location, update):
        self.mem[location] = format(update, "x08") 
+
+    def rob_retire(self):
+        self.rob.retire(self)
 
     def pc_increment(self):
         self.pc += 1
@@ -91,22 +94,19 @@ class cpu(object):
     def execute(self):
         self.execute_unit.execute(self)
 
+    def update_rat(self, source, dest):
+        self.rat[source] = dest
+
     def write_back(self):
-        self.write_back_unit.write_back(self, self.execute_unit.link)
+        self.write_back_unit.write_back(self)
 
     def limited_run(self, cycles=2):
         print("Limited run of " + str(cycles) + " cycles")
         for i in range(cycles):
-            print("***********************")
-            print("cycle: " + str(i))
-            print("prior cycle")
             self.fetch()
             self.decode()
-            pprint(self.sb)
             self.execute()
             self.write_back()
-            print("------------\nAfter cycle:")
-            #reg_next = dict(self.write_back.reg)
-            pprint(self.reg)
-            #self.reg = dict(reg_next)
+            time.sleep(1)
+            print(self.reg, end='\n')
 
