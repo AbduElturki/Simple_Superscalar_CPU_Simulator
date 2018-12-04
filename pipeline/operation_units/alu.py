@@ -1,12 +1,15 @@
-#ALU
-#0x00 ADD | 0x04 XOR | 
-#0x01 SUB | 0x05 SHL | 
-#0x02 MUL | 0x06 SHR |
-#0x03 DIV | 0x07 CMP |
-
 class alu_logic(object):
     def __init__(self):
-        self.buf = 0
+        self.is_loaded =False
+        self.decode = None
+        self.is_busy = False
+        self.clock = 0
+
+    def load_decode(self, decode):
+        self.decode = decode
+        self.is_busy = True
+        self.is_loaded = True
+
     def execute(self, cpu, decode):
         dest = decode[2]
         r2 = cpu.get_value(decode[3])

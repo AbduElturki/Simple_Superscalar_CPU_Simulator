@@ -14,12 +14,7 @@ class execute_unit(object):
         self.decode = cpu.decode_unit.decode
         if self.decode[0] is "ALU":
             self.alu_unit.execute(cpu, self.decode)
-            self.buf = self.alu_unit.buf
         elif self.decode[0] is "DT":
             self.data_transfer_unit.execute(self.decode, cpu)
-            self.buf = self.data_transfer_unit.MBR
         elif self.decode[0] is "CF": 
             self.control_flow_unit.execute(self.decode, cpu)
-            self.link = self.control_flow_unit.link
-            if self.link:
-                self.buf = self.control_flow_unit.buf

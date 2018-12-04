@@ -89,27 +89,22 @@ class decode_unit(object):
             elif self.instruct_reg[0] is 0x21: #JI
                 self.decode = ["CF", 0x1, int(op[2] + op[3], 16)]
             elif self.instruct_reg[0] is 0x22: #JR
-                r1 = cpu.get_dest(r1)
-                self.decode = ["CF", 0x2, r1]
+                self.decode = ["CF", 0x2, int(op[2] + op[3], 16)]
             elif self.instruct_reg[0] is 0x23: #JAL
-                self.decode = ["CF", 0x3, r1]
-                r1 = cpu.get_dest(r1)
+                self.decode = ["CF", 0x3, int(op[2] + op[3], 16)]
 
             elif self.instruct_reg[0] is 0x24: #BEGZ
-                self.decode = ["CF", 0x4, r1, r2]
                 r1 = cpu.get_dest(r1)
+                self.decode = ["CF", 0x4, r1, int(op[2]+op[3], 16)]
                 r2 = cpu.get_dest(r2)
             elif self.instruct_reg[0] is 0x25: #BLTZ
-                self.decode = ["CF", 0x5, r1, r2]
                 r1 = cpu.get_dest(r1)
-                r2 = cpu.get_dest(r2)
+                self.decode = ["CF", 0x5, r1, int(op[2]+op[3], 16)]
             elif self.instruct_reg[0] is 0x26: #BZ
-                self.decode = ["CF", 0x6, r1, r2]
                 r1 = cpu.get_dest(r1)
-                r2 = cpu.get_dest(r2)
+                self.decode = ["CF", 0x6, r1, int(op[2]+op[3], 16)]
             elif self.instruct_reg[0] is 0x27: #BGZ
-                self.decode = ["CF", 0x7, r1, r2]
                 r1 = cpu.get_dest(r1)
-                r2 = cpu.get_dest(r2)
+                self.decode = ["CF", 0x7, r1, int(op[2]+op[3], 16)]
             else:
                 raise Exception("Tried to decode nonexistent Controlflow instruction") 
