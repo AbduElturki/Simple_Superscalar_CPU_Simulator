@@ -36,10 +36,20 @@ class reservation_station(object):
                 break
 
     def is_free_op_unit(self):
-        return any([op.busy for op in self.op_unit])
+        return any([(not op.is_busy) for op in self.op_unit])
+
+    def is_all_op_unit_busy(self):
+        return all([op.is_busy for op in self.op_unit])
+
+    def issue_to_op(self, decode):
+        for i in range(len(self.op_unit)):
+            if not self.op_unit[i].is_busy:
+                self.op_unit[i].load_decode(decode)
 
     def issue(self):
         for row in range(self.size):
+            if self.is_all_op_unit_busy():
+                break
             if self.reservation['busy'].iloc[row]:
                 rs = self.reservation.iloc[row]
                 if rs['valid_1'] and rs['valid_2']:
@@ -57,11 +67,10 @@ class reservation_station(object):
                                       'valid_2' : [False],
                                       'offset' : [0x00]
                                     }))
-                    return decode
+                    self.issue_to_op(decode)
             else:
                 raise Exception("Stall should have occured here")
 
-    #Not Secure
     def add_instruction(self, decode, cpu):
         if not self.is_free_space():
             raise Exception("Tried to add to instruction to RS when it is not\

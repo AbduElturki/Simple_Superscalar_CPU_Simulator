@@ -1,7 +1,8 @@
 from .op_unit import op_unit
 
 class control_flow(op_unit):
-    def execute(self, decode, cpu):
+    def execute(self, cpu):
+        decode = self.decode
         if decode[1] is 0x0:
             cpu.pc = cpu.get_value(decode[2])
         elif decode[1] is 0x1:

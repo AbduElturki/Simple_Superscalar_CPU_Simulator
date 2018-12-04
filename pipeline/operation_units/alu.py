@@ -1,7 +1,8 @@
 from .op_unit import op_unit
 
 class alu_logic(op_unit):
-    def execute(self, cpu, decode):
+    def execute(self, cpu):
+        decode = self.decode
         dest = decode[2]
         r2 = cpu.get_value(decode[3])
         r3 = cpu.get_value(decode[4])

@@ -1,7 +1,8 @@
 from .op_unit import op_unit
 
 class data_transfer(object):
-    def execute(self, decode, cpu):
+    def execute(self, cpu):
+        decode = self.decode
         if decode[1] is 0x0: #LD
             dest = cpu.get_dest(decode[2])
             self.store = False
