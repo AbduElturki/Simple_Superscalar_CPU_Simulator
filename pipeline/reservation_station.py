@@ -1,8 +1,9 @@
 import pandas as pd
 
 class reservation_station(object):
-    def __init__(self, size=16):
+    def __init__(self, op_unit=[], size=16):
         self.size = size
+        self.op_unit = op_unit
         self.reservation = pd.DataFrame({'busy' : [False] * size,
                                          'unit' : [None] * size,
                                          'opcode' : [0x00] * size,
@@ -17,8 +18,25 @@ class reservation_station(object):
     def is_free_space(self):
         return (self.reservation['busy'] == False).any()
 
+    def is_empty(self):
+        return (self.reservation['busy'] == False).all()
+
     def is_full(self):
         return all(self.reservation['busy'].tolist())
+
+    def is_issuable(self):
+        return any(self.reservation['valid_1'].tolist() and \
+                   self.reservation['valid_2'].tolist())
+
+    def bypass(self, cpu, decode):
+        for op in self.op_unit:
+            if not op.busy:
+                op.load_decode(decode)
+                op.execute(cpu, decode)
+                break
+
+    def is_free_op_unit(self):
+        return any([op.busy for op in self.op_unit])
 
     def issue(self):
         for row in range(self.size):
@@ -108,6 +126,6 @@ class reservation_station(object):
 
     def sb_update(self, cpu):
         self.reservation['valid_1'] = self.reservation['op_1'].apply(
-            lambda x: cpu.sb[x] if isinstance(x, str) else True)
+            lambda x: cpu.get_valid(x) if isinstance(x, str) else True)
         self.reservation['valid_2'] = self.reservation['op_2'].apply(
-            lambda x: cpu.sb[x] if isinstance(x, str) else True)
+            lambda x: cpu.get_valid(x) if isinstance(x, str) else True)

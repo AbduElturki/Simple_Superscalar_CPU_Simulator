@@ -1,15 +1,6 @@
+from .op_unit import op_unit
+
 class data_transfer(object):
-    def __init__(self):
-        self.is_loaded =False
-        self.decode = None
-        self.is_busy = False
-        self.clock = 0
-
-    def load_decode(self, decode):
-        self.decode = decode
-        self.is_busy = True
-        self.is_loaded = True
-
     def execute(self, decode, cpu):
         if decode[1] is 0x0: #LD
             dest = cpu.get_dest(decode[2])

@@ -1,15 +1,6 @@
-class alu_logic(object):
-    def __init__(self):
-        self.is_loaded =False
-        self.decode = None
-        self.is_busy = False
-        self.clock = 0
+from .op_unit import op_unit
 
-    def load_decode(self, decode):
-        self.decode = decode
-        self.is_busy = True
-        self.is_loaded = True
-
+class alu_logic(op_unit):
     def execute(self, cpu, decode):
         dest = decode[2]
         r2 = cpu.get_value(decode[3])

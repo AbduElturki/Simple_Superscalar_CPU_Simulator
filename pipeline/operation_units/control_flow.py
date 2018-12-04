@@ -1,10 +1,6 @@
-class control_flow(object):
-    def __init__(self):
-        self.is_loaded =False
-        self.decode = None
-        self.is_busy = False
-        self.clock = 0
+from .op_unit import op_unit
 
+class control_flow(op_unit):
     def execute(self, decode, cpu):
         if decode[1] is 0x0:
             cpu.pc = cpu.get_value(decode[2])
