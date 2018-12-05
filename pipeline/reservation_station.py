@@ -29,10 +29,10 @@ class reservation_station(object):
                    self.reservation['valid_2'].tolist())
 
     def bypass(self, cpu, decode):
-        for op in self.op_unit:
-            if not op.busy:
-                op.load_decode(decode)
-                op.execute(cpu, decode)
+        for i in range(len(self.op_unit)):
+            if not self.op_unit[i].busy:
+                self.op_unit[i].load_decode(decode)
+                self.op_unit[i].execute(cpu)
                 break
 
     def is_free_op_unit(self):
@@ -45,6 +45,12 @@ class reservation_station(object):
         for i in range(len(self.op_unit)):
             if not self.op_unit[i].is_busy:
                 self.op_unit[i].load_decode(decode)
+
+    def execute(self, cpu):
+        if not self.is_all_op_unit_busy():
+            for i in range(len(self.op_unit)):
+                if self.op_unit[i].is_loaded:
+                    self.op_unit[i].execute(cpu)
 
     def issue(self):
         for row in range(self.size):

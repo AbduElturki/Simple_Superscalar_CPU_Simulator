@@ -79,8 +79,8 @@ class cpu(object):
     def rob_retire(self):
         self.rob.retire(self)
 
-    def pc_increment(self):
-        self.pc += 1
+    def pc_increment(self, step=1):
+        self.pc += step
 
     def update_instruct_reg(self):
         self.instruct_reg = self.mem[self.pc]
