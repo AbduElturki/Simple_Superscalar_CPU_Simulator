@@ -35,6 +35,11 @@ class reservation_station(object):
                 self.op_unit[i].execute(cpu)
                 break
 
+    def free_slots(self):
+        f = lambda x: not x
+        busy_list = self.reservation['busy'].tolist()
+        return sum(map(f, busy_list))
+
     def is_free_op_unit(self):
         return any([(not op.is_busy) for op in self.op_unit])
 

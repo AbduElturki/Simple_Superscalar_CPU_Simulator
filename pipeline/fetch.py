@@ -1,6 +1,8 @@
 class fetch_unit(object):
     def __init__ (self):
         self.pc = None
+        self.sequential = []
+        self.target = []
     
     def jump(self, target):
         if type(target) is not int:
