@@ -2,22 +2,32 @@ import time
 
 from .memory import reg, rat, score_board
 from .reorder_buffer import reorder_buffer
-from pprint import pprint
+from collections import deque
 
 class cpu(object):
-    def __init__(self, instruct, fetch_unit, decode_unit, execute_unit, write_back_unit):
+    def __init__(self,  instruct, fetch_unit, decode_unit, execute_unit, write_back_unit):
         self.pc = 0x00
+        self.seq_pc = 0x00
+        self.tar1_pc = 0x00
+        self.tar2_pc = 0x00
 
         self.reg = reg
         self.sb = score_board 
         self.rat = rat
         self.rob = reorder_buffer(64)
-        self.instruct_reg = '00000000'
         self.WBR = {} 
+
+        self.instruct_reg = {"sequential" : deque(maxlen=24),
+                             "target-1"   : deque(maxlen=24),
+                             "target-2"   : deque(maxlen=24)
+                            }
+        self.seq_target_cache = ["sequential", "target-1", "target-2"]
+        self.instruct_buf = 0
         
         self.mem = ['00000000'] * 1024
         self.mem[:len(instruct)] = instruct
 
+        self.branch_predictor = branch_predictor
         self.fetch_unit = fetch_unit
         self.decode_unit = decode_unit
         self.execute_unit = execute_unit

@@ -1,25 +1,43 @@
 class branch_predictor(object):
     def __init__(self):
-        self.state = 2
-        self.taken = True
+        self.forward_state = 2
+        self.forward_taken = True
+        self.backward_state = 1
+        self.backward_taken = False 
 
-    def to_take(self):
-        return self.taken
+    def to_take(self, forward):
+        if forward:
+            return self.forward_taken
+        else:
+            return self.backward_taken
 
     def to_stall(self):
         pass
 
-    def update(self, taken):
-        if taken:
-            if self.state is 3:
-                self.state = 3
+    def update(self, forward, taken):
+        if forward:
+            if taken:
+                if self.forward_state is 3:
+                    self.forward_state = 3
+                else:
+                    self.forward_state += 1
+                    self.forward_taken = True if self.forward_state > 1 else False
             else:
-                self.state += 1
-                self.taken = True if self.state > 1 else False
+                if self.forward_state is 0:
+                    self.forward_state = 0
+                else:
+                    self.forward_state -= 1
+                    self.forward_taken = True if self.forward_state > 1 else False
         else:
-            if self.state is 0:
-                self.state = 0
+            if taken:
+                if self.backward_state is 3:
+                    self.backward_state = 3
+                else:
+                    self.backward_state += 1
+                    self.backward_taken = True if self.backward_state > 1 else False
             else:
-                self.state -= 1
-                self.taken = True if self.state > 1 else False
-
+                if self.backward_state is 0:
+                    self.backward_state = 0
+                else:
+                    self.backward_state -= 1
+                    self.backward_taken = True if self.backward_state > 1 else False
