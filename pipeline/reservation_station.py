@@ -24,9 +24,21 @@ class reservation_station(object):
     def is_full(self):
         return all(self.reservation['busy'].tolist())
 
-    def is_issuable(self):
+    def is_any_slot_ready(self):
         return any(self.reservation['valid_1'].tolist() and \
                    self.reservation['valid_2'].tolist())
+
+    def is_free_op_unit(self):
+        return any([(not op.is_busy) for op in self.op_unit])
+
+    def is_issuable(self):
+        return self.is_any_slot_ready() or self.is_free_space()
+
+    def is_all_op_unit_busy(self):
+        return all([op.is_busy for op in self.op_unit])
+
+    def can_bypass(self):
+        return self.is_empty() and self.is_free_op_unit()
 
     def bypass(self, cpu, decode):
         for i in range(len(self.op_unit)):
@@ -39,12 +51,6 @@ class reservation_station(object):
         f = lambda x: not x
         busy_list = self.reservation['busy'].tolist()
         return sum(map(f, busy_list))
-
-    def is_free_op_unit(self):
-        return any([(not op.is_busy) for op in self.op_unit])
-
-    def is_all_op_unit_busy(self):
-        return all([op.is_busy for op in self.op_unit])
 
     def issue_to_op(self, decode):
         for i in range(len(self.op_unit)):

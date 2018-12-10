@@ -7,9 +7,6 @@ from collections import deque
 class cpu(object):
     def __init__(self,  instruct, fetch_unit, decode_unit, execute_unit, write_back_unit):
         self.pc = 0x00
-        self.seq_pc = 0x00
-        self.tar1_pc = 0x00
-        self.tar2_pc = 0x00
 
         self.reg = reg
         self.sb = score_board 
@@ -17,15 +14,14 @@ class cpu(object):
         self.rob = reorder_buffer(64)
         self.WBR = {} 
 
-        self.instruct_reg = {"sequential" : deque(maxlen=24),
-                             "target-1"   : deque(maxlen=24),
-                             "target-2"   : deque(maxlen=24)
-                            }
-        self.seq_target_cache = ["sequential", "target-1", "target-2"]
-        self.instruct_buf = 0
+        self.instruct_buffer = deque(maxlen=8)
+        self.instruct_fork = {"sequential" : deque(maxlen=6),
+                              "target"     : deque(maxlen=6)
+                             }
+
         
         self.mem = ['00000000'] * 1024
-        self.mem[:len(instruct)] = instruct
+        self.instruct_cache = deque(instruct)
 
         self.branch_predictor = branch_predictor
         self.fetch_unit = fetch_unit
@@ -34,6 +30,13 @@ class cpu(object):
         self.write_back_unit = write_back_unit
 
         self.running = False
+
+    # Boolean
+
+    def is_speculative(self):
+        return self.branch_predictor.speculative
+    
+    # Memory access
 
     def get_dest(self, reg):
         if reg not in self.reg:
@@ -71,6 +74,8 @@ class cpu(object):
         else:
             raise Exception("get_value: dest doesn't exist " + dest[:3])
 
+    # Memory update
+
     def update_reg(self, dest, update):
         if dest in self.reg:
             self.reg[dest] = update
@@ -92,8 +97,7 @@ class cpu(object):
     def pc_increment(self, step=1):
         self.pc += step
 
-    def update_instruct_reg(self):
-        self.instruct_reg = self.mem[self.pc]
+    # CPU stages
 
     def fetch(self):
         self.fetch_unit.fetch(self)
