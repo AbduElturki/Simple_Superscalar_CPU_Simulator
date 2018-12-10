@@ -12,7 +12,8 @@ class reservation_station(object):
                                          'valid_1' : [False] * size,
                                          'op_2' : [0x00] * size,
                                          'valid_2' : [False] * size,
-                                         'offset' : [0x00] * size
+                                         'offset' : [0x00] * size,
+                                         'spec' : [False] * size
                                         })
 
     def is_free_space(self):
@@ -63,6 +64,27 @@ class reservation_station(object):
                 if self.op_unit[i].is_loaded:
                     self.op_unit[i].execute(cpu)
 
+    def flush(self):
+        for row in range(self.size):
+            if self.reservation['spec'].iloc[row]:
+                self.reservation = self.reservation.drop(row).reset_index(
+                    drop=True)
+                self.reservation = self.reservation.append(
+                    pd.DataFrame({'busy' : [False],
+                                  'unit' : [None],
+                                  'opcode' : [0x00],
+                                  'dest' : [0x00],
+                                  'op_1' : [0x00],
+                                  'valid_1' : [False],
+                                  'op_2' : [0x00],
+                                  'valid_2' : [False],
+                                  'offset' : [0x00],
+                                  'spec' : False
+                                }))
+
+    def merge(self):
+        self.reservation['spec'] = [False] * self.size
+      
     def issue(self):
         for row in range(self.size):
             if self.is_all_op_unit_busy():
@@ -82,7 +104,8 @@ class reservation_station(object):
                                       'valid_1' : [False],
                                       'op_2' : [0x00],
                                       'valid_2' : [False],
-                                      'offset' : [0x00]
+                                      'offset' : [0x00],
+                                      'spec' : False
                                     }))
                     self.issue_to_op(decode)
             else:
@@ -94,7 +117,8 @@ class reservation_station(object):
                             free")
         for row in range(self.size):
             if not self.reservation['busy'].iloc[row]:
-                self.reservation.iloc[row] = decode_to_rs(decode, cpu)
+                self.reservation.iloc[row] = (decode_to_rs(decode, cpu) +
+                                              [cpu.is_speculative])
                 break
 
     def add_instruction_test(self):

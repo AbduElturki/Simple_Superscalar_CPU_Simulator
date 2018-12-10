@@ -5,7 +5,26 @@ class decode_unit(object):
         self.decode = []
         #self.decoder(reg)
 
+    def check_if_free(self, cpu, instruct):
+        opcode = int(instruct[:2], 16)
+        if opcode in range(0x01, 0x0A) or opcode is 0x15:
+            return cpu.is_unit_free("ALU")
+        elif opcode in range(0x10, 0x15):
+            return cpu.is_unit_free("DT")
+        elif opcode in range(0x20, 0x28):
+            return cpu.is_unit_free("CF")
+        else:
+            raise Exception("Unit doesn't exist")
+            
+
     def decoder(self, cpu):
+        if not cpu.is_stalling():
+            while len(cpu.instruct_buf):
+                self.check_if_free(cpu, cpu.instruct_buf[0])
+                
+                pass
+
+    def decode(self, cpu):
         self.instruct_reg = [cpu.instruct_reg[i:i+2] for i in [0,2,4,6]]
         self.instruct_reg[0] = int(self.instruct_reg[0],16)
         op = self.instruct_reg
@@ -85,18 +104,17 @@ class decode_unit(object):
         elif self.instruct_reg[0] <= 0x27:
             if self.instruct_reg[0] is 0x20: #J
                 r1 = cpu.get_dest(r1)
-                self.decode = ["CF", 0x0, r1]
+                self.decode = ["CF", 0x0, r3]
             elif self.instruct_reg[0] is 0x21: #JI
-                self.decode = ["CF", 0x1, int(op[2] + op[3], 16)]
+                self.decode = ["CF", 0x1, int(op[1] + op[2] + op[3], 16)]
             elif self.instruct_reg[0] is 0x22: #JR
-                self.decode = ["CF", 0x2, int(op[2] + op[3], 16)]
+                self.decode = ["CF", 0x2, int(int[1] + op[2] + op[3], 16)]
             elif self.instruct_reg[0] is 0x23: #JAL
-                self.decode = ["CF", 0x3, int(op[2] + op[3], 16)]
+                self.decode = ["CF", 0x3, int(op[1] + op[2] + op[3], 16)]
 
             elif self.instruct_reg[0] is 0x24: #BEGZ
                 r1 = cpu.get_dest(r1)
                 self.decode = ["CF", 0x4, r1, int(op[2]+op[3], 16)]
-                r2 = cpu.get_dest(r2)
             elif self.instruct_reg[0] is 0x25: #BLTZ
                 r1 = cpu.get_dest(r1)
                 self.decode = ["CF", 0x5, r1, int(op[2]+op[3], 16)]

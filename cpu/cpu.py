@@ -28,13 +28,35 @@ class cpu(object):
         self.decode_unit = decode_unit
         self.execute_unit = execute_unit
         self.write_back_unit = write_back_unit
+        
+        self.stall_count = 0
 
+        self.speculate_mode = False
+        self.is_seq = False
+        self.stalling = False
         self.running = False
 
     # Boolean
 
+    def is_unit_free(self, unit):
+        self.execute_unit.is_free_space(unit)
+
+    def is_stalling(self):
+        return self.stalling
+
     def is_speculative(self):
-        return self.branch_predictor.speculative
+        return self.speculate_mode
+
+    def speculate(self, forward):
+        self.is_seq = not self.branch_predictor.to_take(forward)
+        self.speculate_mode = True
+
+    def stall(self):
+        self.stalling = True
+        self.stall_count += 1
+
+    def stall_reset(self):
+        self.stalling = False
     
     # Memory access
 
@@ -100,6 +122,7 @@ class cpu(object):
     # CPU stages
 
     def fetch(self):
+        spaces = self.decode_unit.free_spaces()
         self.fetch_unit.fetch(self)
 
     def decode(self):
