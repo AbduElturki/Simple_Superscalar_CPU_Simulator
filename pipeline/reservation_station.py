@@ -43,7 +43,7 @@ class reservation_station(object):
 
     def bypass(self, cpu, decode):
         for i in range(len(self.op_unit)):
-            if not self.op_unit[i].busy:
+            if not self.op_unit[i].is_busy:
                 self.op_unit[i].load_decode(decode)
                 self.op_unit[i].execute(cpu)
                 break
@@ -53,10 +53,10 @@ class reservation_station(object):
         busy_list = self.reservation['busy'].tolist()
         return sum(map(f, busy_list))
 
-    def issue_to_op(self, decode):
+    def issue_to_op(self, decode, spec):
         for i in range(len(self.op_unit)):
             if not self.op_unit[i].is_busy:
-                self.op_unit[i].load_decode(decode)
+                self.op_unit[i].load_decode(decode, spec)
 
     def execute(self, cpu):
         if not self.is_all_op_unit_busy():
@@ -81,9 +81,15 @@ class reservation_station(object):
                                   'offset' : [0x00],
                                   'spec' : False
                                 }))
+        for i in range(len(self.op_unit)):
+            if self.op_unit[i].is_loaded and self.op_unit[i].is_speculative():
+                self.op_unit[i].flush()
 
     def merge(self):
         self.reservation['spec'] = [False] * self.size
+        for i in range(len(self.op_unit)):
+            if self.op_unit[i].is_loaded and self.op_unit[i].is_speculative():
+                self.op_unit[i].merge()
       
     def issue(self):
         for row in range(self.size):
@@ -93,6 +99,7 @@ class reservation_station(object):
                 rs = self.reservation.iloc[row]
                 if rs['valid_1'] and rs['valid_2']:
                     decode = self.rs_to_decode(rs)
+                    spec = rs['spec']
                     self.reservation = self.reservation.drop(row).reset_index(
                         drop=True)
                     self.reservation = self.reservation.append(
@@ -105,9 +112,9 @@ class reservation_station(object):
                                       'op_2' : [0x00],
                                       'valid_2' : [False],
                                       'offset' : [0x00],
-                                      'spec' : False
+                                      'spec' : [False]
                                     }))
-                    self.issue_to_op(decode)
+                    self.issue_to_op(decode, spec)
             else:
                 raise Exception("Stall should have occured here")
 

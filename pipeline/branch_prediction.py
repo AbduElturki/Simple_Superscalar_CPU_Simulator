@@ -11,9 +11,6 @@ class branch_predictor(object):
         else:
             return self.backward_taken
 
-    def to_stall(self):
-        pass
-
     def update(self, forward, taken):
         if forward:
             if taken:

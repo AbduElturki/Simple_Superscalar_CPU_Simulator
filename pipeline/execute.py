@@ -39,3 +39,15 @@ class execute_unit(object):
         if self.free_spaces() and cpu.is_stalling():
             cpu.stall_reset()
         cpu.decode()
+
+    def merge(self):
+        self.rs['ALU'].merge()
+        self.rs['DT'].merge()
+        self.rs['CT'].merge()
+
+    def flush(self):
+        self.rs['ALU'].flush()
+        self.rs['DT'].flush()
+        self.rs['CT'].flush()
+        
+

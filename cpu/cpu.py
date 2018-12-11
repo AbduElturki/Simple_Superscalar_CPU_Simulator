@@ -2,26 +2,29 @@ import time
 
 from .memory import reg, rat, score_board
 from .reorder_buffer import reorder_buffer
-from collections import deque
+from collections import defaultdict, deque
 
 class cpu(object):
     def __init__(self,  instruct, fetch_unit, decode_unit, execute_unit, write_back_unit):
         self.pc = 0x00
+        self.cycle = 0
 
         self.reg = reg
         self.sb = score_board 
         self.rat = rat
         self.rob = reorder_buffer(64)
         self.WBR = {} 
+        self.WBR_spec = {}
 
         self.instruct_buffer = deque(maxlen=8)
-        self.instruct_fork = {"sequential" : deque(maxlen=6),
-                              "target"     : deque(maxlen=6)
+        self.instruct_fork = {"sequential" : deque(maxlen=8),
+                              "target"     : deque(maxlen=8)
                              }
 
         
+        self.spec_mem = defaultdict(int)
         self.mem = ['00000000'] * 1024
-        self.instruct_cache = deque(instruct)
+        self.instruct_cache = instruct
 
         self.branch_predictor = branch_predictor
         self.fetch_unit = fetch_unit
@@ -30,6 +33,7 @@ class cpu(object):
         self.write_back_unit = write_back_unit
         
         self.stall_count = 0
+        self.instruct_per_cycle = defaultdict(int)
 
         self.is_seq = False
         self.stalling = False
@@ -44,11 +48,14 @@ class cpu(object):
         return self.stalling
 
     def is_speculative(self):
-        return self.speculate_mode
+        return self.fetch_unit.speculative
+
+    def is_spec_forward(self):
+        return self.fetch_unit.is_forward
 
     def speculate(self, forward):
         self.is_seq = not self.branch_predictor.to_take(forward)
-        self.speculate_mode = True
+        #self.speculate_mode = True
 
     def stall(self):
         self.stalling = True
@@ -63,8 +70,30 @@ class cpu(object):
         else:
             return "target"
 
-    def load_to_rs(self, decode):
-        self.execute_unit.load(decode, self)
+    def update_branch_pred(self, taken, forward):
+        self.branch_predictor.update(taken, forward)
+
+    def commit_fork(self, spec):
+        if spec in self.instruct_fork:
+            self.instruct_buffer = self.instruct_fork[spec].copy()
+            self.fetch_unit.reset()
+        else:
+            raise Exception(spec + "doesn't exist")
+
+    def spec_merge(self):
+        self.execute_unit.merge()
+        self.rob.merge()
+        for addr in self.spec_mem:
+            self.mem[addr] = self.spec_mem[addr]
+        self.spec_mem = defaultdict(int)
+
+    def spec_flush(self):
+        self.execute_unit.flush()
+        self.rob.flush()
+        self.spec_mem = defaultdict(int)
+
+    def load_to_rs(self, decode, spec):
+        self.execute_unit.load(decode, self, spec)
 
     # Memory access
 
@@ -73,8 +102,8 @@ class cpu(object):
             raise Exception("get_dist: Register doesn't exist")
         return self.rat[reg]
 
-    def new_dest(self, reg):
-        self.rob.issue(reg, 00, False)
+    def new_dest(self, reg, spec):
+        self.rob.issue(reg, 00, False, spec)
         self.rat[reg] = 'ROB' + str(self.rob.tail - 1).zfill(2)
 
     def set_valid(self, dest):
@@ -115,14 +144,12 @@ class cpu(object):
         else:
             raise Exception("")
 
-    def update_pc(self, dest):
-        self.pc = dest
-
     def store(self, location, update):
        self.mem[location] = format(update, "x08") 
 
     def rob_retire(self):
-        self.rob.retire(self)
+        if not self.rob.is_empty():
+            self.rob.retire(self)
 
     def pc_increment(self, step=1):
         self.pc += step
@@ -145,13 +172,29 @@ class cpu(object):
     def write_back(self):
         self.write_back_unit.write_back(self)
 
+    def is_running(self):
+        if self.pc == len(instruct_cache) and self.rob.is_empty():
+            return False
+        else:
+            return True
+
+    def run(self):
+        while self.is_running():
+            self.write_back()
+            self.execute()
+            self.decode()
+            self.fetch()
+            self.cycle += 1
+            time.sleep(1)
+            print(self.reg, end='\n')
+
     def limited_run(self, cycles=2):
         print("Limited run of " + str(cycles) + " cycles")
         for i in range(cycles):
-            self.fetch()
-            self.decode()
-            self.execute()
             self.write_back()
+            self.execute()
+            self.decode()
+            self.fetch()
             time.sleep(1)
             print(self.reg, end='\n')
 

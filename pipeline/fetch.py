@@ -6,7 +6,7 @@ class fetch_unit(object):
         self.speculative = False
         self.is_forward = False
     
-    def get_target(self, cpu, instruct):
+    def get_target(self, cpu, instruct, jal):
         if int(instruct[:2], 16) is 0x20:
             reg = "R"+str(int(instruct[6:8],16))
             target = cpu.get_value(reg)
@@ -15,9 +15,10 @@ class fetch_unit(object):
         elif int(instruct[:2], 16) is 0x22:
             target = cpu.pc + int(instruct[2:], 16)
         elif int(instruct[:2], 16) is 0x23:
-            cpu.new_dest("R14")
-            cpu.update_reg("R14", cpu.pc)
-            cpu.set_valid("R14")
+            if jal:
+                cpu.new_dest("R14", True)
+                cpu.update_reg("R14", cpu.pc)
+                cpu.set_valid("R14")
         elif int(instruct[:2], 16) in range(0x24, 28):
             target = int(instruct[4:], 16)
             pass
@@ -31,14 +32,23 @@ class fetch_unit(object):
         forward = lambda x: True if cpu.pc < x else False
         if not cpu.is_stalling():
             for cycle in range(self.cycles):
-                instruct = self.instruct_cache.popleft() 
                 if self.speculative:
-                    self.instruct_fork["target"].append(instruct)
-                    instruct = cpu.buf[cpu.seq_pc]
-                    cpu.tar_pc += 1
-                    self.instruct_fork["sequential"].append(instruct)
-                    cpu.seq_pc += 1
-                elif jump(instruct):
+                    instruct = cpu.instruct_cache[self.tar_pc]
+                    cpu.instruct_fork["target"].append(instruct)
+                    if jump(instruct):
+                        jal = cpu.speculate_mode() is "target"
+                        self.tar_pc = self.get_target(cpu, instruct, jal)
+                    else:
+                        cpu.tar_pc += 1
+                    instruct = cpu.instruct_cache[cpu.seq_pc]
+                    cpu.instruct_fork["sequential"].append(instruct)
+                    if jump(instruct):
+                        jal = cpu.speculate_mode() is "sequential"
+                        self.seq_pc = self.get_target(cpu, instruct)
+                    else:
+                        cpu.seq_pc += 1
+                instruct = cpu.instruct_cache[self.pc]
+                if jump(instruct):
                     cpu.instruct_buffer.append(instruct)
                     cpu.pc = get_target(cpu, instruct) 
                 elif branch(instruct):

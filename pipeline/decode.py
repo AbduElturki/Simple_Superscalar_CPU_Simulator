@@ -48,7 +48,7 @@ class decode_unit(object):
             raise Exception('Negative Operand')
         
         elif self.instruct_reg[0] <= 0x0A or self.instruct_reg[0] == 0x15:
-            cpu.new_dest(r1)
+            cpu.new_dest(r1, spec)
             r1 = cpu.get_dest(r1)
             r2 = cpu.get_dest(r2)
             r3 = cpu.get_dest(r3)
@@ -88,12 +88,12 @@ class decode_unit(object):
 
         elif self.instruct_reg[0] <= 0x14:
             if self.instruct_reg[0] is 0x10: #LD
-                cpu.new_dest(r1)
+                cpu.new_dest(r1, spec)
                 r1 = cpu.get_dest(r1)
                 r2 = cpu.get_dest(r2)
                 decode = ["DT", 0x0, r1, r2] 
             elif self.instruct_reg[0] is 0x11: #LDI
-                cpu.new_dest(r1)
+                cpu.new_dest(r1, spec)
                 r1 = cpu.get_dest(r1)
                 decode = ["DT", 0x1, r1, int(op[2] + op[3], 16)] 
             elif self.instruct_reg[0] is 0x12: #ST
@@ -105,7 +105,7 @@ class decode_unit(object):
                 r3 = cpu.get_dest(r3)
                 decode = ["DT", 0x3, r1, int(op[2], 16), r3]
             elif self.instruct_reg[0] is 0x14: #LDO
-                cpu.new_dest(r1)
+                cpu.new_dest(r1, spec)
                 r1 = cpu.get_dest(r1)
                 r3 = cpu.get_dest(r3)
                 decode = ["DT", 0x4, r1, int(op[2], 16), r3]
