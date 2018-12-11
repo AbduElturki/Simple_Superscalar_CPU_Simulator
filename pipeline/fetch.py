@@ -39,17 +39,17 @@ class fetch_unit(object):
                     self.instruct_fork["sequential"].append(instruct)
                     cpu.seq_pc += 1
                 elif jump(instruct):
-                    cpu.instruct_buf.append(instruct)
+                    cpu.instruct_buffer.append(instruct)
                     cpu.pc = get_target(cpu, instruct) 
                 elif branch(instruct):
-                    cpu.instruct_buf.append(instruct)
+                    cpu.instruct_buffer.append(instruct)
                     target = get_target(cpu, instruct) 
                     self.is_forward = forward(target)
                     cpu.speculate(self.is_forward)
                     self.speculative = True
                     self.tar_pc = target 
                 else:
-                    cpu.instruct_buf.append(instruct)
+                    cpu.instruct_buffer.append(instruct)
 
     def reset(self):
         self.speculative = False

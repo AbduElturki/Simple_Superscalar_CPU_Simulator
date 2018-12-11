@@ -111,14 +111,14 @@ class reservation_station(object):
             else:
                 raise Exception("Stall should have occured here")
 
-    def add_instruction(self, decode, cpu):
+    def add_instruction(self, decode, cpu, spec):
         if not self.is_free_space():
             raise Exception("Tried to add to instruction to RS when it is not\
                             free")
         for row in range(self.size):
             if not self.reservation['busy'].iloc[row]:
                 self.reservation.iloc[row] = (decode_to_rs(decode, cpu) +
-                                              [cpu.is_speculative])
+                                              [spec])
                 break
 
     def add_instruction_test(self):

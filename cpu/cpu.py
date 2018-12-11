@@ -31,7 +31,6 @@ class cpu(object):
         
         self.stall_count = 0
 
-        self.speculate_mode = False
         self.is_seq = False
         self.stalling = False
         self.running = False
@@ -58,6 +57,15 @@ class cpu(object):
     def stall_reset(self):
         self.stalling = False
     
+    def speculate_mode():
+        if self.is_seq:
+            return "sequential"
+        else:
+            return "target"
+
+    def load_to_rs(self, decode):
+        self.execute_unit.load(decode, self)
+
     # Memory access
 
     def get_dest(self, reg):
@@ -122,8 +130,8 @@ class cpu(object):
     # CPU stages
 
     def fetch(self):
-        spaces = self.decode_unit.free_spaces()
-        self.fetch_unit.fetch(self)
+        if len(self.instruct_cache):
+            self.fetch_unit.fetch(self)
 
     def decode(self):
         self.decode_unit.decoder(self)

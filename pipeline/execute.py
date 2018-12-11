@@ -37,4 +37,5 @@ class execute_unit(object):
                 self.rs[unit].issue()
             self.rs[unit].execute(cpu)
         if self.free_spaces() and cpu.is_stalling():
-            cpu.stall_rest()
+            cpu.stall_reset()
+        cpu.decode()
