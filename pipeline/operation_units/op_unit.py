@@ -17,6 +17,7 @@ class op_unit(object):
         self.decode = None
         self.is_busy = False
         self.is_loaded = False
+        self.clock = 0
 
     def merge(self):
         if self.is_loaded:

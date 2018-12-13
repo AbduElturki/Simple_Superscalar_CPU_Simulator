@@ -1,4 +1,5 @@
 import pandas as pd
+pd.options.mode.chained_assignment = None 
 
 class reservation_station(object):
     def __init__(self, op_unit=[], size=16):
@@ -8,16 +9,17 @@ class reservation_station(object):
                                          'unit' : [None] * size,
                                          'opcode' : [0x00] * size,
                                          'dest' : [0x00] * size,
-                                         'op_1' : [0x00] * size,
+                                         'op_1' : [None] * size,
                                          'valid_1' : [False] * size,
-                                         'op_2' : [0x00] * size,
+                                         'op_2' : [None] * size,
                                          'valid_2' : [False] * size,
                                          'offset' : [0x00] * size,
                                          'spec' : [False] * size
                                         })
 
     def is_free_space(self):
-        return (self.reservation['busy'] == False).any()
+        f = lambda x: not x
+        return any(map(f,self.reservation['busy'].tolist()))
 
     def is_empty(self):
         return (self.reservation['busy'] == False).all()
@@ -38,13 +40,15 @@ class reservation_station(object):
     def is_all_op_unit_busy(self):
         return all([op.is_busy for op in self.op_unit])
 
-    def can_bypass(self):
-        return self.is_empty() and self.is_free_op_unit()
+    def can_bypass(self, decode, cpu):
+        rs = self.decode_to_rs(decode, cpu)
+        valid = rs[5] and rs[7]
+        return self.is_empty() and self.is_free_op_unit() and valid
 
-    def bypass(self, cpu, decode):
+    def bypass(self, decode, cpu, spec):
         for i in range(len(self.op_unit)):
             if not self.op_unit[i].is_busy:
-                self.op_unit[i].load_decode(decode)
+                self.op_unit[i].load_decode(decode, spec)
                 self.op_unit[i].execute(cpu)
                 break
 
@@ -57,9 +61,9 @@ class reservation_station(object):
         for i in range(len(self.op_unit)):
             if not self.op_unit[i].is_busy:
                 self.op_unit[i].load_decode(decode, spec)
+                break
 
     def execute(self, cpu):
-        if not self.is_all_op_unit_busy():
             for i in range(len(self.op_unit)):
                 if self.op_unit[i].is_loaded:
                     self.op_unit[i].execute(cpu)
@@ -74,9 +78,9 @@ class reservation_station(object):
                                   'unit' : [None],
                                   'opcode' : [0x00],
                                   'dest' : [0x00],
-                                  'op_1' : [0x00],
+                                  'op_1' : [None],
                                   'valid_1' : [False],
-                                  'op_2' : [0x00],
+                                  'op_2' : [None],
                                   'valid_2' : [False],
                                   'offset' : [0x00],
                                   'spec' : False
@@ -107,16 +111,16 @@ class reservation_station(object):
                                       'unit' : [None],
                                       'opcode' : [0x00],
                                       'dest' : [0x00],
-                                      'op_1' : [0x00],
+                                      'op_1' : [None],
                                       'valid_1' : [False],
-                                      'op_2' : [0x00],
+                                      'op_2' : [None],
                                       'valid_2' : [False],
                                       'offset' : [0x00],
                                       'spec' : [False]
                                     }))
+                    self.reservation = self.reservation.reset_index(drop=True)
                     self.issue_to_op(decode, spec)
-            else:
-                raise Exception("Stall should have occured here")
+                    break
 
     def add_instruction(self, decode, cpu, spec):
         if not self.is_free_space():
@@ -124,7 +128,7 @@ class reservation_station(object):
                             free")
         for row in range(self.size):
             if not self.reservation['busy'].iloc[row]:
-                self.reservation.iloc[row] = (decode_to_rs(decode, cpu) +
+                self.reservation.iloc[row] = (self.decode_to_rs(decode, cpu) +
                                               [spec])
                 break
 
@@ -137,7 +141,7 @@ class reservation_station(object):
                 self.reservation['busy'].iloc[row] = True
                 break
 
-    def decode_to_rs(decode, cpu):
+    def decode_to_rs(self, decode, cpu):
         if decode[0] is "ALU":
             if type(decode[4]) is int:
                 return [True, "ALU", decode[1], decode[2], decode[3],
@@ -147,9 +151,12 @@ class reservation_station(object):
                         cpu.get_valid(decode[3]), decode[4],
                         cpu.get_valid(decode[4]), 0]
         elif decode[0] is "DT":
-            if decode[1] in [0x0, 0x1]:
+            if decode[1] is 0x0:
                 return [True, "DT", decode[1], decode[2], decode[3],
                         cpu.get_valid(decode[3]), 0, True, 0]
+            elif decode[1] is 0x1:
+                return [True, "DT", decode[1], decode[2], decode[3],
+                        True, 0, True, 0]
             elif decode[1] is 0x2:
                 return [True, "DT", decode[1], decode[2], decode[3], True, 0,
                         True, 0]
@@ -167,7 +174,7 @@ class reservation_station(object):
                         cpu.get_valid(decode[2]), decode[3], 
                         cpu.get_valid(decode[3]), 0]
 
-    def rs_to_decode(rs):
+    def rs_to_decode(self, rs):
         if rs['unit'] is "ALU":
             return ["ALU", rs['opcode'], rs['dest'], rs['op_1'], rs['op_2']]
         elif rs['unit'] is "DT":
@@ -182,7 +189,18 @@ class reservation_station(object):
                 return ["CF", rs['opcode'], rs['op_1'], rs['op_2']]
 
     def sb_update(self, cpu):
-        self.reservation['valid_1'] = self.reservation['op_1'].apply(
-            lambda x: cpu.get_valid(x) if isinstance(x, str) else True)
+        self.reservation['valid_1'] =  self.reservation['op_1'].apply(
+            lambda x: cpu.get_valid(x) if str(x)[0] is "R" else False if x is
+            None else True)
         self.reservation['valid_2'] = self.reservation['op_2'].apply(
-            lambda x: cpu.get_valid(x) if isinstance(x, str) else True)
+            lambda x: cpu.get_valid(x) if str(x)[0] is "R" else False if x is
+            None else True)
+
+    def update_op(self, rob, reg):
+        for row in range(self.size):
+            if not self.reservation['busy'].iloc[row]:
+                break
+            if self.reservation['op_1'].iloc[row] == rob:
+                self.reservation['op_1'].iloc[row] = reg
+            if self.reservation['op_2'].iloc[row] == rob:
+                self.reservation['op_2'].iloc[row] = reg

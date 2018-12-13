@@ -16,9 +16,10 @@ class decode_unit(object):
             
 
     def decoder(self, cpu):
+        cpu.retire_his = {}
         if not cpu.is_stalling():
-            while len(cpu.instruct_buf):
-                if self.check_if_free(cpu, cpu.instruct_buf[0]):
+            while len(cpu.instruct_buffer):
+                if self.check_if_free(cpu, cpu.instruct_buffer[0]):
                     instruct = cpu.instruct_buffer.popleft() 
                     self.decode(cpu, instruct, False)
                 else:
@@ -33,7 +34,6 @@ class decode_unit(object):
                     else:
                         cpu.stall()
                         break
-            cpu.fetch()
 
     def decode(self, cpu, instruct, spec):
         self.instruct_reg = [instruct[i:i+2] for i in [0,2,4,6]]

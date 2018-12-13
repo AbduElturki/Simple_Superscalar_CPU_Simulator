@@ -1,9 +1,9 @@
 class branch_predictor(object):
     def __init__(self):
-        self.forward_state = 2
-        self.forward_taken = True
-        self.backward_state = 1
-        self.backward_taken = False 
+        self.forward_state = 1
+        self.forward_taken = False 
+        self.backward_state = 2
+        self.backward_taken = True 
 
     def to_take(self, forward):
         if forward:

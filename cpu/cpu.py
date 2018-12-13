@@ -5,14 +5,15 @@ from .reorder_buffer import reorder_buffer
 from collections import defaultdict, deque
 
 class cpu(object):
-    def __init__(self,  instruct, fetch_unit, decode_unit, execute_unit, write_back_unit):
-        self.pc = 0x00
+    def __init__(self,  instruct, branch_predictor, fetch_unit, decode_unit, execute_unit, write_back_unit):
+        self.pc = 0
         self.cycle = 0
 
         self.reg = reg
         self.sb = score_board 
         self.rat = rat
         self.rob = reorder_buffer(64)
+        self.retire_his = {}
         self.WBR = {} 
         self.WBR_spec = {}
 
@@ -42,7 +43,7 @@ class cpu(object):
     # Boolean
 
     def is_unit_free(self, unit):
-        self.execute_unit.is_free_space(unit)
+        return self.execute_unit.is_free_space(unit)
 
     def is_stalling(self):
         return self.stalling
@@ -99,7 +100,7 @@ class cpu(object):
 
     def get_dest(self, reg):
         if reg not in self.reg:
-            raise Exception("get_dist: Register doesn't exist")
+            raise Exception("get_dist: " + reg + " Register doesn't exist")
         return self.rat[reg]
 
     def new_dest(self, reg, spec):
@@ -147,6 +148,9 @@ class cpu(object):
     def store(self, location, update):
        self.mem[location] = format(update, "x08") 
 
+    def rs_update_dest(self, rob, reg):
+        self.execute_unit.update_rs_dest(rob, reg)
+
     def rob_retire(self):
         if not self.rob.is_empty():
             self.rob.retire(self)
@@ -157,7 +161,8 @@ class cpu(object):
     # CPU stages
 
     def fetch(self):
-        if len(self.instruct_cache):
+        if not (self.pc == len(self.instruct_cache)):
+            print(self.pc)
             self.fetch_unit.fetch(self)
 
     def decode(self):
@@ -173,20 +178,36 @@ class cpu(object):
         self.write_back_unit.write_back(self)
 
     def is_running(self):
-        if self.pc == len(instruct_cache) and self.rob.is_empty():
+        if (self.pc == len(self.instruct_cache) and self.rob.is_empty() and 
+            len(self.instruct_buffer) == 0):
             return False
         else:
             return True
 
+    def print_reg(self):
+        print("-------------------------")
+        print("| REG |  Value   | SB   |")
+        print("|-----+----------+------|")
+        for reg in self.reg:
+            seperator = "  | " if len(reg) == 2 else " | "
+            print("| " + reg + seperator + str(self.reg[reg]).zfill(8) +
+                  " | " + str(self.sb[reg]) + " |")
+        print("-------------------------\n")
+
     def run(self):
+        #while True:
         while self.is_running():
+            print("Cycle: " + str(self.cycle))
+            print("PC: " + str(self.pc))
             self.write_back()
             self.execute()
             self.decode()
             self.fetch()
             self.cycle += 1
-            time.sleep(1)
-            print(self.reg, end='\n')
+            self.print_reg()
+            print()
+            print("*******************************\n")
+            time.sleep(2)
 
     def limited_run(self, cycles=2):
         print("Limited run of " + str(cycles) + " cycles")

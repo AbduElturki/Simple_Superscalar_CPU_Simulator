@@ -1,4 +1,5 @@
 import pandas as pd
+pd.options.mode.chained_assignment = None 
 
 class reorder_buffer(object):
     def __init__(self, size=64):
@@ -13,13 +14,18 @@ class reorder_buffer(object):
     
     def retire(self, cpu):
         head_row = self.rob.iloc[self.head]
-        if head_row['valid'] and not head_row['spec']:
+        while head_row['valid'] and not head_row['spec']:
             reg = self.rob['reg'].iloc[self.head]
             value = self.rob['value'].iloc[self.head]
+            rob = 'ROB' + str(self.head).zfill(2)
             cpu.reg[reg] = value
             cpu.sb[reg] = True
             cpu.update_rat(reg, reg)
+            cpu.rs_update_dest(rob, reg)
+            cpu.retire_his[rob] = reg
+            self.rob.iloc[self.head] = [None, 0x00, False, False]
             self.head = self.head + 1 % self.size 
+            head_row = self.rob.iloc[self.head]
             if cpu.is_stalling():
                 cpu.stall_reset()
 
@@ -27,7 +33,7 @@ class reorder_buffer(object):
         if self.tail + 1 % self.size is self.head:
             raise Exception("There should be stall here")
         else:
-            self.rob.iloc[self.tail] = [reg, value, valid]
+            self.rob.iloc[self.tail] = [reg, value, valid, spec]
             self.tail = self.tail + 1 % self.size 
             if self.tail + 1 % self.size is self.head:
                 cpu.stall()

@@ -5,6 +5,7 @@ class control_flow(op_unit):
         decode = self.decode
         if decode[1] in range(0x4):
             cpu.instruct_per_cycle[cpu.cycle] += 1
+            self.clear()
 
         elif decode[1] >= 0x4:
             r1 = cpu.get_value(decode[2])
@@ -29,6 +30,7 @@ class control_flow(op_unit):
                         cpu.spec_flush()
                         cpu.update_branch_pred(True, forwad)
                         cpu.commit_fork("target")
+                self.clear()
             elif decode[1] is 0x5:
                 if r1 < 0:
                     if cpu.speculate_mode() is "target":
@@ -48,6 +50,7 @@ class control_flow(op_unit):
                         cpu.spec_flush()
                         cpu.update_branch_pred(True, forwad)
                         cpu.commit_fork("target")
+                self.clear()
             elif decode[1] is 0x6:
                 if r1 != 0:
                     if cpu.speculate_mode() is "target":
@@ -67,6 +70,7 @@ class control_flow(op_unit):
                         cpu.spec_flush()
                         cpu.update_branch_pred(True, forwad)
                         cpu.commit_fork("target")
+                self.clear()
             elif decode[1] is 0x7:
                 if r1 > 0:
                     if cpu.speculate_mode() is "target":
@@ -86,6 +90,7 @@ class control_flow(op_unit):
                         cpu.spec_flush()
                         cpu.update_branch_pred(True, forwad)
                         cpu.commit_fork("target")
+                self.clear()
             else:
                 raise Exception("In conditional branch section of control_flow\
                                 , decode[1] is larger than 0x7")

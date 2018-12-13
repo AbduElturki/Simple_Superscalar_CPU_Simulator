@@ -47,19 +47,23 @@ class fetch_unit(object):
                         self.seq_pc = self.get_target(cpu, instruct)
                     else:
                         cpu.seq_pc += 1
-                instruct = cpu.instruct_cache[self.pc]
-                if jump(instruct):
-                    cpu.instruct_buffer.append(instruct)
-                    cpu.pc = get_target(cpu, instruct) 
-                elif branch(instruct):
-                    cpu.instruct_buffer.append(instruct)
-                    target = get_target(cpu, instruct) 
-                    self.is_forward = forward(target)
-                    cpu.speculate(self.is_forward)
-                    self.speculative = True
-                    self.tar_pc = target 
                 else:
-                    cpu.instruct_buffer.append(instruct)
+                    instruct = cpu.instruct_cache[cpu.pc]
+                    if jump(instruct):
+                        cpu.instruct_buffer.append(instruct)
+                        cpu.pc = get_target(cpu, instruct) 
+                    elif branch(instruct):
+                        cpu.instruct_buffer.append(instruct)
+                        target = get_target(cpu, instruct) 
+                        self.is_forward = forward(target)
+                        cpu.speculate(self.is_forward)
+                        self.speculative = True
+                        self.tar_pc = target 
+                    else:
+                        cpu.instruct_buffer.append(instruct)
+                    cpu.pc_increment()
+                if cpu.pc == len(cpu.instruct_cache):
+                    break
 
     def reset(self):
         self.speculative = False
