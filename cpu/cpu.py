@@ -35,6 +35,8 @@ class cpu(object):
         
         self.stall_count = 0
         self.instruct_per_cycle = defaultdict(int)
+        self.branching = 0
+        self.correct_branching = 0
 
         self.is_seq = False
         self.stalling = False
@@ -174,6 +176,10 @@ class cpu(object):
 
     def decode(self):
         self.decode_unit.decoder(self)
+        if not self.is_stalling() and len(self.instruct_buffer) == 8:
+            self.stall()
+        elif self.is_stalling() and not len(self.instruct_buffer) == 8:
+            self.stall_reset()
 
     def execute(self):
         self.execute_unit.execute(self)
@@ -191,6 +197,13 @@ class cpu(object):
         else:
             return True
 
+    def print_status(self):
+        sum_instruct = sum(self.instruct_per_cycle.values())
+        ipc = sum_instruct/(self.cycle)
+        percentage = (100 if not self.branching else
+                      self.correct_branching/self.branching * 100.00)
+        print("IPC: " + str(ipc))
+        print("Prediction Accuracy: " + str(percentage) + "%")
     
     def print_reg(self):
         print("--------------------------")
@@ -220,6 +233,7 @@ class cpu(object):
             print()
             print("*******************************\n")
             time.sleep(2)
+        self.print_status()
 
     def limited_run(self, cycles=2):
         print("Limited run of " + str(cycles) + " cycles")

@@ -32,6 +32,8 @@ class fetch_unit(object):
         forward = lambda x: True if cpu.pc < x else False
         if not cpu.is_stalling():
             for cycle in range(self.cycles):
+                if cpu.pc == len(cpu.instruct_cache): 
+                    break
                 if self.speculative:
                     if not self.tar_pc == len(cpu.instruct_cache):
                         instruct = cpu.instruct_cache[self.tar_pc]
@@ -55,6 +57,7 @@ class fetch_unit(object):
                         cpu.instruct_buffer.append(instruct)
                         cpu.pc = get_target(cpu, instruct) 
                     elif branch(instruct):
+                        cpu.branching += 1
                         cpu.instruct_buffer.append(instruct)
                         target = self.get_target(cpu, instruct) 
                         self.is_forward = forward(target)
@@ -65,8 +68,6 @@ class fetch_unit(object):
                         
                     else:
                         cpu.instruct_buffer.append(instruct)
-                    if cpu.pc == len(cpu.instruct_cache): 
-                        break
                     cpu.pc_increment()
 
     def merge(self, cpu):

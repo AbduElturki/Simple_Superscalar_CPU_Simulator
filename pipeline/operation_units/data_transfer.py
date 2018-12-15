@@ -19,6 +19,7 @@ class data_transfer(op_unit):
                     cpu.WBR[dest] = cpu.spec_mem[MAR]
                 else:
                     cpu.WBR[dest] = cpu.mem[MAR]
+                cpu.instruct_per_cycle[cpu.cycle] += 1
                 self.clear()
             else:
                 self.clock += 1
@@ -26,6 +27,7 @@ class data_transfer(op_unit):
             dest = decode[2]
             self.store = False
             cpu.WBR[dest] = decode[3]
+            cpu.instruct_per_cycle[cpu.cycle] += 1
             self.clear()
         elif decode[1] == 0x2: #ST
             if self.clock == 1:
@@ -45,6 +47,7 @@ class data_transfer(op_unit):
                     cpu.spec_mem[MAR] = orig
                 else:
                     cpu.mem[MAR] = orig 
+                cpu.instruct_per_cycle[cpu.cycle] += 1
                 self.clear()
             else:
                 self.clock += 1
@@ -71,6 +74,7 @@ class data_transfer(op_unit):
                     cpu.spec_mem[offset + MAR] = orig 
                 else:
                     cpu.mem[offset + MAR] = orig 
+                cpu.instruct_per_cycle[cpu.cycle] += 1
                 self.clear()
             else:
                 self.clock += 1
@@ -91,6 +95,7 @@ class data_transfer(op_unit):
                     cpu.WBR[dest] = cpu.spec_mem[MAR + offset]
                 else:
                     cpu.WBR[dest] = cpu.mem[MAR + offset]
+                cpu.instruct_per_cycle[cpu.cycle] += 1
                 self.clear()
             else:
                 self.clock += 1

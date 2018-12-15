@@ -16,6 +16,7 @@ class control_flow(op_unit):
                     cpu.update_branch_pred(True, forward)
                     cpu.commit_fork("target")
                     if cpu.speculate_mode() is "target": #Prediction Correct
+                        cpu.correct_branching += 1
                         cpu.spec_merge()
                     else: #Prediction Incorrect
                         cpu.spec_flush()
@@ -23,6 +24,7 @@ class control_flow(op_unit):
                     cpu.update_branch_pred(False, forward)
                     cpu.commit_fork("sequential")
                     if cpu.speculate_mode() is "sequential": #Prediction Correct
+                        cpu.correct_branching += 1
                         cpu.spec_merge()
                     else: #Prediction Incorrect
                         cpu.spec_flush()
@@ -32,6 +34,7 @@ class control_flow(op_unit):
                     cpu.update_branch_pred(True, forward)
                     cpu.commit_fork("target")
                     if cpu.speculate_mode() is "target": #Prediction Correct
+                        cpu.correct_branching += 1
                         cpu.spec_merge()
                     else: #Prediction Incorrect
                         cpu.spec_flush()
@@ -39,6 +42,7 @@ class control_flow(op_unit):
                     cpu.update_branch_pred(False, forward)
                     cpu.commit_fork("sequential")
                     if cpu.speculate_mode() is "sequential": #Prediction Correct
+                        cpu.correct_branching += 1
                         cpu.spec_merge()
                     else: #Prediction Incorrect
                         cpu.spec_flush()
@@ -48,6 +52,7 @@ class control_flow(op_unit):
                     cpu.update_branch_pred(True, forward)
                     cpu.commit_fork("target")
                     if cpu.speculate_mode() is "target": #Prediction Correct
+                        cpu.correct_branching += 1
                         cpu.spec_merge()
                     else: #Prediction Incorrect
                         cpu.spec_flush()
@@ -55,6 +60,7 @@ class control_flow(op_unit):
                     cpu.update_branch_pred(False, forward)
                     cpu.commit_fork("sequential")
                     if cpu.speculate_mode() is "sequential": #Prediction Correct
+                        cpu.correct_branching += 1
                         cpu.spec_merge()
                     else: #Prediction Incorrect
                         cpu.spec_flush()
@@ -64,6 +70,7 @@ class control_flow(op_unit):
                     cpu.update_branch_pred(True, forward)
                     cpu.commit_fork("target")
                     if cpu.speculate_mode() is "target": #Prediction Correct
+                        cpu.correct_branching += 1
                         cpu.spec_merge()
                     else: #Prediction Incorrect
                         cpu.spec_flush()
@@ -71,6 +78,7 @@ class control_flow(op_unit):
                     cpu.update_branch_pred(False, forward)
                     cpu.commit_fork("sequential")
                     if cpu.speculate_mode() is "sequential": #Prediction Correct
+                        cpu.correct_branching += 1
                         cpu.spec_merge()
                     else: #Prediction Incorrect
                         cpu.spec_flush()
