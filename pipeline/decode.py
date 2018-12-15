@@ -5,14 +5,14 @@ class decode_unit(object):
 
     def check_if_free(self, cpu, instruct):
         opcode = int(instruct[:2], 16)
-        if opcode in range(0x01, 0x0A) or opcode is 0x15:
+        if opcode in range(0x01, 0x0B) or opcode is 0x15:
             return cpu.is_unit_free("ALU")
         elif opcode in range(0x10, 0x15):
             return cpu.is_unit_free("DT")
         elif opcode in range(0x20, 0x28):
             return cpu.is_unit_free("CF")
         else:
-            raise Exception("Unit doesn't exist")
+            raise Exception("Unit doesn't exist " + str(opcode))
             
 
     def decoder(self, cpu):
@@ -22,6 +22,8 @@ class decode_unit(object):
                 if self.check_if_free(cpu, cpu.instruct_buffer[0]):
                     instruct = cpu.instruct_buffer.popleft() 
                     self.decode(cpu, instruct, False)
+                    if cpu.is_stalling():
+                        break
                 else:
                     cpu.stall()
                     break
@@ -31,6 +33,8 @@ class decode_unit(object):
                                           cpu.instruct_fork[cpu.speculate_mode()][0]):
                         instruct = cpu.instruct_fork[cpu.speculate_mode()].popleft()
                         self.decode(cpu, instruct, True)
+                    if cpu.is_stalling():
+                        break
                     else:
                         cpu.stall()
                         break
@@ -48,22 +52,25 @@ class decode_unit(object):
             raise Exception('Negative Operand')
         
         elif self.instruct_reg[0] <= 0x0A or self.instruct_reg[0] == 0x15:
-            cpu.new_dest(r1, spec)
-            r1 = cpu.get_dest(r1)
-            r2 = cpu.get_dest(r2)
-            r3 = cpu.get_dest(r3)
             #Type-I ALU
             if self.instruct_reg[0] in [0x02, 0x0A]:
+                r2 = cpu.get_dest(r2)
+                cpu.new_dest(r1, spec)
+                r1 = cpu.get_dest(r1)
                 r1 = "R"+str(int(op[1],16))
                 if self.instruct_reg[0] is 0x02:
-                    decode = ["ALU", 0x00, r1, cpu.reg[r1], int(op[2]+op[3], 16)]
+                    decode = ["ALU", 0x00, r1, r2, int(op[3], 16)]
                 elif self.instruct_reg[0] is 0x0A:
-                    decode = ["ALU", 0x01, r1, cpu.reg[r1], int(op[2]+op[3], 16)]
+                    decode = ["ALU", 0x01, r1, r2, int(op[3], 16)]
                 else:
                     raise Exception("Tried to decode nonexistent Type I ALU opcode")
 
             #Type-R ALU
             else:
+                r2 = cpu.get_dest(r2)
+                r3 = cpu.get_dest(r3)
+                cpu.new_dest(r1, spec)
+                r1 = cpu.get_dest(r1)
 
                 if self.instruct_reg[0] is 0x01: #ADD
                     decode = ["ALU", 0x0, r1, r2, r3]
@@ -82,15 +89,15 @@ class decode_unit(object):
                 elif self.instruct_reg[0] is 0x09: #DIV
                     decode = ["ALU", 0x7, r1, r2, r3]
                 elif self.instruct_reg[0] is 0x15: #MOV
-                    decode = ["ALU", 0x0, r1, r2, "R0"]
+                    decode = ["ALU", 0x0, r1, r3, 0]
                 else:
                     raise Exception("Tried to decode nonexistent Type R ALU opcode")
 
         elif self.instruct_reg[0] <= 0x14:
             if self.instruct_reg[0] is 0x10: #LD
+                r2 = cpu.get_dest(r2)
                 cpu.new_dest(r1, spec)
                 r1 = cpu.get_dest(r1)
-                r2 = cpu.get_dest(r2)
                 decode = ["DT", 0x0, r1, r2] 
             elif self.instruct_reg[0] is 0x11: #LDI
                 cpu.new_dest(r1, spec)
@@ -105,9 +112,9 @@ class decode_unit(object):
                 r3 = cpu.get_dest(r3)
                 decode = ["DT", 0x3, r1, int(op[2], 16), r3]
             elif self.instruct_reg[0] is 0x14: #LDO
+                r3 = cpu.get_dest(r3)
                 cpu.new_dest(r1, spec)
                 r1 = cpu.get_dest(r1)
-                r3 = cpu.get_dest(r3)
                 decode = ["DT", 0x4, r1, int(op[2], 16), r3]
             else:
                 raise Exception("Tried to decode nonexistent Data Transfer instruction") 
@@ -139,5 +146,4 @@ class decode_unit(object):
                 raise Exception("Tried to decode nonexistent Controlflow instruction") 
         else:
             raise Exception("Opcode doesn't exist")
-
         cpu.load_to_rs(decode, spec)
