@@ -65,32 +65,38 @@ class cpu(object):
     def stall_reset(self):
         self.stalling = False
     
-    def speculate_mode():
+    def speculate_mode(self):
         if self.is_seq:
             return "sequential"
         else:
             return "target"
 
     def update_branch_pred(self, taken, forward):
-        self.branch_predictor.update(taken, forward)
+        self.branch_predictor.update(forward, taken)
 
     def commit_fork(self, spec):
         if spec in self.instruct_fork:
             self.instruct_buffer = self.instruct_fork[spec].copy()
-            self.fetch_unit.reset()
         else:
             raise Exception(spec + "doesn't exist")
+        self.instruct_fork = {"sequential" : deque(maxlen=8),
+                              "target"     : deque(maxlen=8)
+                             }
 
     def spec_merge(self):
         self.execute_unit.merge()
         self.rob.merge()
+        self.fetch_unit.merge(self)
+        self.fetch_unit.reset()
         for addr in self.spec_mem:
             self.mem[addr] = self.spec_mem[addr]
         self.spec_mem = defaultdict(int)
 
     def spec_flush(self):
         self.execute_unit.flush()
+        self.fetch_unit.flush(self)
         self.rob.flush()
+        self.fetch_unit.reset()
         self.spec_mem = defaultdict(int)
 
     def load_to_rs(self, decode, spec):
@@ -117,7 +123,9 @@ class cpu(object):
         pass
 
     def get_valid(self, dest):
-        if dest in self.reg:
+        if isinstance(dest, int):
+            raise Exception("get_valid: " + str(dest) + "is int")
+        elif dest in self.reg:
             return self.sb[dest]
         elif dest[:3] == "ROB":
             location = int(dest[-2:])
@@ -162,7 +170,6 @@ class cpu(object):
 
     def fetch(self):
         if not (self.pc == len(self.instruct_cache)):
-            print(self.pc)
             self.fetch_unit.fetch(self)
 
     def decode(self):
@@ -184,21 +191,26 @@ class cpu(object):
         else:
             return True
 
+    
     def print_reg(self):
-        print("-------------------------")
-        print("| REG |  Value   | SB   |")
-        print("|-----+----------+------|")
+        print("--------------------------")
+        print("| REG |  Value   | SB    |")
+        print("|-----+----------+-------|")
         for reg in self.reg:
+            border = "  |" if self.sb[reg] else " |"
             seperator = "  | " if len(reg) == 2 else " | "
             print("| " + reg + seperator + str(self.reg[reg]).zfill(8) +
-                  " | " + str(self.sb[reg]) + " |")
-        print("-------------------------\n")
+                  " | " + str(self.sb[reg]) + border)
+        print("---------------------------\n")
 
     def run(self):
-        #while True:
         while self.is_running():
             print("Cycle: " + str(self.cycle))
             print("PC: " + str(self.pc))
+            print("Stalling: " + str(self.is_stalling()))
+            print("Branching: " + str(self.is_speculative()))
+            print("Spec mode: " + self.speculate_mode())
+            print()
             self.write_back()
             self.execute()
             self.decode()

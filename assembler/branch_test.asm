@@ -1,0 +1,4 @@
+LDI R1 1
+BZ R1 2
+LDI R2 2
+LDI R3 3

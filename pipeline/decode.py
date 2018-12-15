@@ -26,10 +26,10 @@ class decode_unit(object):
                     cpu.stall()
                     break
             if cpu.is_speculative():
-                while len(cpu.instruct_fork[cpu.speculate_mode]):
+                while len(cpu.instruct_fork[cpu.speculate_mode()]):
                     if self.check_if_free(cpu,
-                                          cpu.instruct_fork[cpu.speculate_mode]):
-                        instruct = cpu.instruct_fork[cpu.speculate_mode].popleft()
+                                          cpu.instruct_fork[cpu.speculate_mode()][0]):
+                        instruct = cpu.instruct_fork[cpu.speculate_mode()].popleft()
                         self.decode(cpu, instruct, True)
                     else:
                         cpu.stall()

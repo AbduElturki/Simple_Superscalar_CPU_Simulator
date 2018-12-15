@@ -13,85 +13,69 @@ class control_flow(op_unit):
             forward = cpu.is_spec_forward()
             if decode[1] is 0x4:
                 if r1 >= 0:
-                    if cpu.speculate_mode() is "target":
+                    cpu.update_branch_pred(True, forward)
+                    cpu.commit_fork("target")
+                    if cpu.speculate_mode() is "target": #Prediction Correct
                         cpu.spec_merge()
-                        cpu.update_branch_pred(True, forwad)
-                        cpu.commit_fork("target")
-                    else:
+                    else: #Prediction Incorrect
                         cpu.spec_flush()
-                        cpu.update_branch_pred(False, forwad)
-                        cpu.commit_fork("sequential")
-                else:
-                    if cpu.speculate_mode() is "sequential":
+                else: #Branch not Taken
+                    cpu.update_branch_pred(False, forward)
+                    cpu.commit_fork("sequential")
+                    if cpu.speculate_mode() is "sequential": #Prediction Correct
                         cpu.spec_merge()
-                        cpu.update_branch_pred(False, forwad)
-                        cpu.commit_fork("sequential")
-                    else:
+                    else: #Prediction Incorrect
                         cpu.spec_flush()
-                        cpu.update_branch_pred(True, forwad)
-                        cpu.commit_fork("target")
                 self.clear()
-            elif decode[1] is 0x5:
+            elif decode[1] == 0x5:
                 if r1 < 0:
-                    if cpu.speculate_mode() is "target":
+                    cpu.update_branch_pred(True, forward)
+                    cpu.commit_fork("target")
+                    if cpu.speculate_mode() is "target": #Prediction Correct
                         cpu.spec_merge()
-                        cpu.update_branch_pred(True, forwad)
-                        cpu.commit_fork("target")
-                    else:
+                    else: #Prediction Incorrect
                         cpu.spec_flush()
-                        cpu.update_branch_pred(False, forwad)
-                        cpu.commit_fork("sequential")
-                else:
-                    if cpu.speculate_mode() is "sequential":
+                else: #Branch not Taken
+                    cpu.update_branch_pred(False, forward)
+                    cpu.commit_fork("sequential")
+                    if cpu.speculate_mode() is "sequential": #Prediction Correct
                         cpu.spec_merge()
-                        cpu.update_branch_pred(False, forwad)
-                        cpu.commit_fork("sequential")
-                    else:
+                    else: #Prediction Incorrect
                         cpu.spec_flush()
-                        cpu.update_branch_pred(True, forwad)
-                        cpu.commit_fork("target")
                 self.clear()
-            elif decode[1] is 0x6:
-                if r1 != 0:
-                    if cpu.speculate_mode() is "target":
+            elif decode[1] == 0x6:
+                if r1 == 0: #Branch Taken
+                    cpu.update_branch_pred(True, forward)
+                    cpu.commit_fork("target")
+                    if cpu.speculate_mode() is "target": #Prediction Correct
                         cpu.spec_merge()
-                        cpu.update_branch_pred(True, forwad)
-                        cpu.commit_fork("target")
-                    else:
+                    else: #Prediction Incorrect
                         cpu.spec_flush()
-                        cpu.update_branch_pred(False, forwad)
-                        cpu.commit_fork("sequential")
-                else:
-                    if cpu.speculate_mode() is "sequential":
+                else: #Branch not Taken
+                    cpu.update_branch_pred(False, forward)
+                    cpu.commit_fork("sequential")
+                    if cpu.speculate_mode() is "sequential": #Prediction Correct
                         cpu.spec_merge()
-                        cpu.update_branch_pred(False, forwad)
-                        cpu.commit_fork("sequential")
-                    else:
+                    else: #Prediction Incorrect
                         cpu.spec_flush()
-                        cpu.update_branch_pred(True, forwad)
-                        cpu.commit_fork("target")
                 self.clear()
-            elif decode[1] is 0x7:
+            elif decode[1] == 0x7:
                 if r1 > 0:
-                    if cpu.speculate_mode() is "target":
+                    cpu.update_branch_pred(True, forward)
+                    cpu.commit_fork("target")
+                    if cpu.speculate_mode() is "target": #Prediction Correct
                         cpu.spec_merge()
-                        cpu.update_branch_pred(True, forwad)
-                        cpu.commit_fork("target")
-                    else:
+                    else: #Prediction Incorrect
                         cpu.spec_flush()
-                        cpu.update_branch_pred(False, forwad)
-                        cpu.commit_fork("sequential")
-                else:
-                    if cpu.speculate_mode() is "sequential":
+                else: #Branch not Taken
+                    cpu.update_branch_pred(False, forward)
+                    cpu.commit_fork("sequential")
+                    if cpu.speculate_mode() is "sequential": #Prediction Correct
                         cpu.spec_merge()
-                        cpu.update_branch_pred(False, forwad)
-                        cpu.commit_fork("sequential")
-                    else:
+                    else: #Prediction Incorrect
                         cpu.spec_flush()
-                        cpu.update_branch_pred(True, forwad)
-                        cpu.commit_fork("target")
                 self.clear()
             else:
-                raise Exception("In conditional branch section of control_flow\
-                                , decode[1] is larger than 0x7")
+                raise Exception("In conditional branch section ofcontrol_flow," +
+                                "decode[1] is larger than 0x7", + decode[1])
             cpu.instruct_per_cycle[cpu.cycle] += 1

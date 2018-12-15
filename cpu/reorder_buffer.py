@@ -51,15 +51,9 @@ class reorder_buffer(object):
         self.rob['value'].iloc[rob] = update
 
     def merge(self):
-        self.rob['spec'] = [False] * size
+        self.rob['spec'] = [False] * self.size
 
     def flush(self):
-        for row in range(self.size):
-            if self.rob['spec'].iloc[row]:
-                self.rob = self.rob.drop(row).reset_index(drop=True)
-                self.rob.append(pd.DataFrame({'reg' : [None] * size,
-                                              'value' : [0x00],
-                                              'valid' : [False],
-                                              'spec'  : [False]
-                                             }))
-                self.tail = self.tail - 1 if self.tail else self.size - 1
+        while self.rob['spec'].iloc[self.tail - 1]:
+            self.rob.iloc[self.tail - 1] = [None, 0x00, False, False]
+            self.tail = self.tail - 1 if self.tail else self.size - 1
