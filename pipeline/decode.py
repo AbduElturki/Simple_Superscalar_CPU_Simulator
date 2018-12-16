@@ -106,7 +106,7 @@ class decode_unit(object):
             elif self.instruct_reg[0] is 0x12: #ST
                 r1 = cpu.get_dest(r1)
                 r2 = cpu.get_dest(r2)
-                decode = ["DT", 0x2, r1, r2]
+                decode = ["DT", 0x2, r1, r3]
             elif self.instruct_reg[0] is 0x13: #STO
                 r1 = cpu.get_dest(r1)
                 r3 = cpu.get_dest(r3)

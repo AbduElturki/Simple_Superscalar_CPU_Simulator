@@ -24,7 +24,7 @@ class cpu(object):
 
         
         self.spec_mem = defaultdict(int)
-        self.mem = ['00000000'] * 1024
+        self.mem = [0] * 1024
         self.instruct_cache = instruct
 
         self.branch_predictor = branch_predictor
@@ -165,6 +165,9 @@ class cpu(object):
         if not self.rob.is_empty():
             self.rob.retire(self)
 
+    def retire_update(self, old, new):
+        self.execute_unit.retire_update(old,new)
+
     def pc_increment(self, step=1):
         self.pc += step
 
@@ -232,8 +235,10 @@ class cpu(object):
             self.print_reg()
             print()
             print("*******************************\n")
+            print(self.mem[:10])
             time.sleep(2)
         self.print_status()
+        print(self.mem[:10])
 
     def limited_run(self, cycles=2):
         print("Limited run of " + str(cycles) + " cycles")

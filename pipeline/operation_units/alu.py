@@ -10,6 +10,8 @@ class alu_logic(op_unit):
             r2 = cpu.get_value(decode[3])
         if decode[4] in cpu.retire_his:
             r3 = cpu.get_value(cpu.retire_his[decode[4]])
+        elif type(decode[4]) is not str:
+            r3 = decode[4]
         else:
             r3 = cpu.get_value(decode[4])
         if decode[1] == 0x00: #ADD 
@@ -47,7 +49,8 @@ class alu_logic(op_unit):
             cpu.instruct_per_cycle[cpu.cycle] += 1
             self.clear()
         elif decode[1] == 0x07: #CMP
-            cpu.WBR[dest] = int('1'*31+'0', 2) if r2 < r3 else 0 if r2 == r3 else 1
+            print(r2)
+            cpu.WBR[dest] = -1 if r2 < r3 else 0 if r2 == r3 else 1
             cpu.instruct_per_cycle[cpu.cycle] += 1
             self.clear()
         else:

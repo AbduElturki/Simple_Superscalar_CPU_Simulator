@@ -27,5 +27,9 @@ class op_unit(object):
         if self.is_loaded and self.spec:
             self.clear()
 
+    def retire_update(self, old, new):
+        if self.is_loaded:
+            self.decode = [(d.replace(old, new) if type(d) is str else d) for d in self.decode]
+
     def is_speculative(self):
         return self.spec

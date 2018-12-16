@@ -31,6 +31,11 @@ class execute_unit(object):
         if not self.free_spaces():
             cpu.stall()
 
+    def retire_update(self, old, new):
+        self.rs['ALU'].retire_update(old, new)
+        self.rs['DT'].retire_update(old, new)
+        self.rs['CF'].retire_update(old, new)
+
     def update_rs_dest(self, rob, reg):
         self.rs['ALU'].update_op(rob, reg)
         self.rs['DT'].update_op(rob, reg)

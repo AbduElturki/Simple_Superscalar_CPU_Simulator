@@ -68,6 +68,11 @@ class reservation_station(object):
                 if self.op_unit[i].is_loaded:
                     self.op_unit[i].execute(cpu)
 
+    def retire_update(self, old, new):
+            for i in range(len(self.op_unit)):
+                if self.op_unit[i].is_loaded:
+                    self.op_unit[i].retire_update(old, new)
+
     def flush(self):
         for row in range(self.size):
             if self.reservation['spec'].iloc[row]:
@@ -158,8 +163,13 @@ class reservation_station(object):
                 return [True, "DT", decode[1], decode[2], decode[3],
                         True, 0, True, 0]
             elif decode[1] == 0x2:
-                return [True, "DT", decode[1], decode[2], decode[3], True, 0,
-                        True, 0]
+                return [True, "DT", decode[1], 0, decode[2],
+                        cpu.get_valid(decode[2]), decode[3],
+                        cpu.get_valid(decode[3]), 0]
+            elif decode[1] == 0x3:
+                return [True, "DT", decode[1], 0, decode[2],
+                        cpu.get_valid(decode[2]), decode[4],
+                        cpu.get_valid(decode[4]), decode[3]]
             else:
                 return [True, "DT", decode[1], decode[2], decode[4],
                         cpu.get_valid(decode[4]), 0, True, decode[3]]
@@ -174,8 +184,12 @@ class reservation_station(object):
         if rs['unit'] is "ALU":
             return ["ALU", rs['opcode'], rs['dest'], rs['op_1'], rs['op_2']]
         elif rs['unit'] is "DT":
-            if rs['opcode'] <= 0x2:
+            if rs['opcode'] < 0x2:
                 return ["DT", rs['opcode'], rs['dest'], rs['op_1']]
+            elif rs['opcode'] == 0x2:
+                return ["DT", rs['opcode'], rs['op_1'], rs['op_2']]
+            elif rs['opcode'] == 0x3:
+                return ["DT", rs['opcode'], rs['op_1'], rs['offset'], rs['op_2']]
             else:
                 return ["DT", rs['opcode'], rs['dest'], rs['offset'], rs['op_1']]
         elif rs['unit'] is "CF":

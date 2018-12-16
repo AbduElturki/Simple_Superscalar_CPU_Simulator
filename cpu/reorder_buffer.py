@@ -22,6 +22,7 @@ class reorder_buffer(object):
             cpu.sb[reg] = True
             cpu.update_rat(reg, reg)
             cpu.rs_update_dest(rob, reg)
+            cpu.retire_update(rob, reg)
             cpu.retire_his[rob] = reg
             self.rob.iloc[self.head] = [None, 0x00, False, False]
             self.head = self.head + 1 % self.size 
