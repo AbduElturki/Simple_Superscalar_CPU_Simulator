@@ -57,7 +57,6 @@ class decode_unit(object):
                 r2 = cpu.get_dest(r2)
                 cpu.new_dest(r1, spec)
                 r1 = cpu.get_dest(r1)
-                r1 = "R"+str(int(op[1],16))
                 if self.instruct_reg[0] is 0x02:
                     decode = ["ALU", 0x00, r1, r2, int(op[3], 16)]
                 elif self.instruct_reg[0] is 0x0A:
@@ -95,10 +94,10 @@ class decode_unit(object):
 
         elif self.instruct_reg[0] <= 0x14:
             if self.instruct_reg[0] is 0x10: #LD
-                r2 = cpu.get_dest(r2)
+                r3 = cpu.get_dest(r3)
                 cpu.new_dest(r1, spec)
                 r1 = cpu.get_dest(r1)
-                decode = ["DT", 0x0, r1, r2] 
+                decode = ["DT", 0x0, r1, r3] 
             elif self.instruct_reg[0] is 0x11: #LDI
                 cpu.new_dest(r1, spec)
                 r1 = cpu.get_dest(r1)

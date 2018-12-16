@@ -13,7 +13,9 @@ class branch_predictor(object):
 
     def update(self, forward, taken):
         if forward:
+            print(self.forward_state)
             if taken:
+                print("Taken")
                 if self.forward_state is 3:
                     self.forward_state = 3
                 else:
@@ -25,6 +27,7 @@ class branch_predictor(object):
                 else:
                     self.forward_state -= 1
                     self.forward_taken = True if self.forward_state > 1 else False
+            print(self.forward_state)
         else:
             if taken:
                 if self.backward_state is 3:

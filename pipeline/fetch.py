@@ -37,25 +37,29 @@ class fetch_unit(object):
                 if self.speculative:
                     if not self.tar_pc == len(cpu.instruct_cache):
                         instruct = cpu.instruct_cache[self.tar_pc]
-                        cpu.instruct_fork["target"].append(instruct)
-                        if jump(instruct):
-                            jal = cpu.speculate_mode() is "target"
-                            self.tar_pc = self.get_target(cpu, instruct, jal)
-                        else:
-                            self.tar_pc += 1
+                        if (not branch(instruct) and not
+                            (len(cpu.instruct_fork['target']) == 8)):
+                            cpu.instruct_fork["target"].append(instruct)
+                            if jump(instruct):
+                                jal = cpu.speculate_mode() is "target"
+                                self.tar_pc = self.get_target(cpu, instruct, jal)
+                            else:
+                                self.tar_pc += 1
                     if not self.seq_pc == len(cpu.instruct_cache):
                         instruct = cpu.instruct_cache[self.seq_pc]
-                        cpu.instruct_fork["sequential"].append(instruct)
-                        if jump(instruct):
-                            jal = cpu.speculate_mode() is "sequential"
-                            self.seq_pc = self.get_target(cpu, instruct)
-                        else:
-                            self.seq_pc += 1
+                        if (not branch(instruct) and not
+                            (len(cpu.instruct_fork['sequential']) == 8)):
+                            cpu.instruct_fork["sequential"].append(instruct)
+                            if jump(instruct):
+                                jal = cpu.speculate_mode() is "sequential"
+                                self.seq_pc = self.get_target(cpu, instruct)
+                            else:
+                                self.seq_pc += 1
                 else:
                     instruct = cpu.instruct_cache[cpu.pc]
                     if jump(instruct):
                         cpu.instruct_buffer.append(instruct)
-                        cpu.pc = get_target(cpu, instruct) 
+                        cpu.pc = self.get_target(cpu, instruct) 
                     elif branch(instruct):
                         cpu.branching += 1
                         cpu.instruct_buffer.append(instruct)

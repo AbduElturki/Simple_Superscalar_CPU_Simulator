@@ -90,6 +90,7 @@ class reservation_station(object):
                                   'offset' : [0x00],
                                   'spec' : False
                                 }))
+                self.reservation = self.reservation.reset_index(drop=True)
         for i in range(len(self.op_unit)):
             if self.op_unit[i].is_loaded and self.op_unit[i].is_speculative():
                 self.op_unit[i].flush()

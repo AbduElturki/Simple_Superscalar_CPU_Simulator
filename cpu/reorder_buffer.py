@@ -25,19 +25,23 @@ class reorder_buffer(object):
             cpu.retire_update(rob, reg)
             cpu.retire_his[rob] = reg
             self.rob.iloc[self.head] = [None, 0x00, False, False]
-            self.head = self.head + 1 % self.size 
+            self.head = (self.head + 1) % self.size 
             head_row = self.rob.iloc[self.head]
             if cpu.is_stalling():
                 cpu.stall_reset()
 
     def issue(self, reg, value, valid, spec):
-        if self.tail + 1 % self.size is self.head:
+        if (self.tail + 1) % self.size is self.head:
             raise Exception("There should be stall here")
         else:
             self.rob.iloc[self.tail] = [reg, value, valid, spec]
-            self.tail = self.tail + 1 % self.size 
+            self.tail = (self.tail + 1) % self.size 
             if self.tail + 1 % self.size is self.head:
                 cpu.stall()
+
+    def print_rob(self):
+        print("ROB")
+        print(self.rob)
 
     def is_empty(self):
         return self.tail == self.head

@@ -25,6 +25,7 @@ class cpu(object):
         
         self.spec_mem = defaultdict(int)
         self.mem = [0] * 1024
+        self.mem[:8] = [102, 1, 4, 68, 6, 3, 9, 8]
         self.instruct_cache = instruct
 
         self.branch_predictor = branch_predictor
@@ -58,6 +59,7 @@ class cpu(object):
 
     def speculate(self, forward):
         self.is_seq = not self.branch_predictor.to_take(forward)
+        print(self.is_seq)
         #self.speculate_mode = True
 
     def stall(self):
@@ -234,9 +236,44 @@ class cpu(object):
             self.cycle += 1
             self.print_reg()
             print()
+            print(self.instruct_buffer)
+            print(self.instruct_fork['sequential'])
+            print(self.instruct_fork['target'])
             print("*******************************\n")
             print(self.mem[:10])
             time.sleep(2)
+        self.print_status()
+        print(self.mem[:10])
+
+    def run_cycle(self):
+        con = True
+        while self.is_running() and con:
+            print("Cycle: " + str(self.cycle))
+            print("PC: " + str(self.pc))
+            print("Stalling: " + str(self.is_stalling()))
+            print("Branching: " + str(self.is_speculative()))
+            print("Spec mode: " + self.speculate_mode())
+            print()
+            self.write_back()
+            self.execute()
+            self.decode()
+            self.fetch()
+            self.cycle += 1
+            self.print_reg()
+            print()
+            print("Instruction Buffer")
+            print(self.instruct_buffer)
+            print("Instruction Fork Sequential")
+            print(self.instruct_fork['sequential'])
+            print("Instruction Fork Target")
+            print(self.instruct_fork['target'])
+            print()
+            self.execute_unit.print_rs()
+            self.rob.print_rob()
+            print("*******************************\n")
+            print(self.mem[:10])
+            inp = input('Continue?')
+            con = False if inp is "n" else True
         self.print_status()
         print(self.mem[:10])
 

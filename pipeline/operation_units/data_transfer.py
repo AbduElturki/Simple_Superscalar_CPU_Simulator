@@ -7,6 +7,10 @@ class data_transfer(op_unit):
             if self.clock == 2:
                 dest = decode[2]
                 MAR = decode[3]
+                print("load instruction")
+                print(decode)
+                print("dest " + dest)
+                print("MAR " + MAR)
                 if dest in cpu.retire_his:
                     dest = cpu.retire_his[dest]
                 if MAR in cpu.retire_his:
@@ -16,9 +20,11 @@ class data_transfer(op_unit):
                 if cpu.is_speculative() and MAR in cpu.spec_mem:
                     cpu.WBR[dest] = cpu.spec_mem[MAR]
                 else:
-                    print(dest)
-                    print(MAR)
                     cpu.WBR[dest] = cpu.mem[MAR]
+                print("dest " + dest)
+                print("value " + str(cpu.mem[MAR]))
+                print("Spec :"+ str(cpu.is_speculative()))
+
                 cpu.instruct_per_cycle[cpu.cycle] += 1
                 self.clear()
             else:
@@ -33,10 +39,15 @@ class data_transfer(op_unit):
             if self.clock == 1:
                 orig = cpu.get_value(decode[2])
                 MAR = cpu.get_value(decode[3])
-                cpu.mem[MAR] = orig 
+                if cpu.is_speculative():
+                    cpu.spec_mem[MAR] = orig
+                else:
+                    cpu.mem[MAR] = orig 
+                print("load instruction")
                 print(decode)
-                print(MAR)
-                print(orig)
+                print("dest " + str(MAR))
+                print("value " + str(orig))
+                print("Spec :"+ str(cpu.is_speculative()))
                 cpu.instruct_per_cycle[cpu.cycle] += 1
                 self.clear()
             else:

@@ -18,6 +18,16 @@ class execute_unit(object):
             spaces += self.rs[unit].free_slots()
         return spaces
 
+    def print_rs(self):
+        print("ALU RS")
+        print(self.rs['ALU'].reservation)
+        print()
+        print("DT RS")
+        print(self.rs['DT'].reservation)
+        print()
+        print("CF RS")
+        print(self.rs['CF'].reservation)
+
     def sb_update(self, cpu):
         self.rs['ALU'].sb_update(cpu)
         self.rs['DT'].sb_update(cpu)
