@@ -21,6 +21,7 @@ class reorder_buffer(object):
             cpu.reg[reg] = value
             cpu.sb[reg] = True
             cpu.update_rat(reg, reg)
+            cpu.his_rat[reg] = reg
             cpu.rs_update_dest(rob, reg)
             cpu.retire_update(rob, reg)
             cpu.retire_his[rob] = reg

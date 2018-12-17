@@ -22,6 +22,7 @@ class decode_unit(object):
                 if self.check_if_free(cpu, cpu.instruct_buffer[0]):
                     instruct = cpu.instruct_buffer.popleft() 
                     self.decode(cpu, instruct, False)
+                    cpu.his_rat = cpu.rat.copy()
                     if cpu.is_stalling():
                         break
                 else:

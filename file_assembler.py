@@ -1,4 +1,4 @@
-from assembler import asm_to_machine
+from assembler.assembler import asm_to_machine
 import sys
 
 def main():

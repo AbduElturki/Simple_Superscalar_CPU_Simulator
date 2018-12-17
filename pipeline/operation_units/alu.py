@@ -50,10 +50,6 @@ class alu_logic(op_unit):
             self.clear()
         elif decode[1] == 0x07: #CMP
             cpu.WBR[dest] = -1 if r2 < r3 else 0 if r2 == r3 else 1
-            print("CMP")
-            print(r2)
-            print(r3)
-            print(-1 if r2 < r3 else 0 if r2 == r3 else 1)
             cpu.instruct_per_cycle[cpu.cycle] += 1
             self.clear()
         else:

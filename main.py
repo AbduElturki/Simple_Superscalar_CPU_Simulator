@@ -14,4 +14,4 @@ else:
     write_back = write_back.write_back()
     branch_predictor = branch_prediction.branch_predictor()
     cpu = cpu.cpu(instructions, branch_predictor, fetch, decode, execute, write_back)
-    cpu.run_cycle()
+    cpu.run()

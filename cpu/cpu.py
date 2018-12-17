@@ -11,7 +11,8 @@ class cpu(object):
 
         self.reg = reg
         self.sb = score_board 
-        self.rat = rat
+        self.rat = rat.copy()
+        self.his_rat = rat.copy()
         self.rob = reorder_buffer(64)
         self.retire_his = {}
         self.WBR = {} 
@@ -23,7 +24,7 @@ class cpu(object):
                              }
 
         
-        self.spec_mem = defaultdict(int)
+        self.spec_mem = {} 
         self.mem = [0] * 1024
         self.mem[:8] = [102, 1, 4, 68, 6, 3, 9, 8]
         self.instruct_cache = instruct
@@ -59,7 +60,6 @@ class cpu(object):
 
     def speculate(self, forward):
         self.is_seq = not self.branch_predictor.to_take(forward)
-        print(self.is_seq)
         #self.speculate_mode = True
 
     def stall(self):
@@ -92,11 +92,14 @@ class cpu(object):
         self.rob.merge()
         self.fetch_unit.merge(self)
         self.fetch_unit.reset()
+        self.his_rat = self.rat.copy()
         for addr in self.spec_mem:
             self.mem[addr] = self.spec_mem[addr]
-        self.spec_mem = defaultdict(int)
+        self.spec_mem = {} 
+        
 
     def spec_flush(self):
+        self.rat = self.his_rat.copy()
         self.execute_unit.flush()
         self.fetch_unit.flush(self)
         self.rob.flush()
@@ -114,8 +117,12 @@ class cpu(object):
         return self.rat[reg]
 
     def new_dest(self, reg, spec):
-        self.rob.issue(reg, 00, False, spec)
-        self.rat[reg] = 'ROB' + str(self.rob.tail - 1).zfill(2)
+        if reg in self.reg:
+            self.rob.issue(reg, 00, False, spec)
+            location = self.rob.tail - 1 if self.rob.tail else self.rob.size - 1
+            self.rat[reg] = 'ROB' + str(location).zfill(2)
+        else:
+            raise Exception(reg + ": is not a register")
 
     def set_valid(self, dest):
         if dest in self.reg:
@@ -133,6 +140,8 @@ class cpu(object):
             return self.sb[dest]
         elif dest[:3] == "ROB":
             location = int(dest[-2:])
+            if self.rob.rob['reg'].iloc[location]  is None:
+                raise Exception(dest + ": doesn't exist")
             return self.rob.rob['valid'].iloc[location]
         else:
             raise Exception("get_valid: dest doesn't exist")
@@ -241,7 +250,7 @@ class cpu(object):
             print(self.instruct_fork['target'])
             print("*******************************\n")
             print(self.mem[:10])
-            time.sleep(2)
+        #    time.sleep(2)
         self.print_status()
         print(self.mem[:10])
 

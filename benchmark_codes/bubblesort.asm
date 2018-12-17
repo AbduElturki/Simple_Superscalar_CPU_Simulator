@@ -3,18 +3,19 @@
 ;R3 start address 2
 
 LDI R8 8
-LDI R2 -1
-LDI R3 0
 
 ;R7 condition
 sortInts:
 LDI R7 0
 swappedLoop:
+SUBI R8 R8 1
 MOV R6 R8
-SUBI R6 R6 1
-BGZ R7 %exit
+LDI R2 -1
+LDI R3 0
+BZ R8 %exit
 LDI R7 1
 loopCount:
+LDI R99 2
 BZ R6 %swappedLoop
 ADDI R2 R2 1
 ADDI R3 R3 1
