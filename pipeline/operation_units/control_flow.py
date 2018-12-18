@@ -11,7 +11,7 @@ class control_flow(op_unit):
             r1 = cpu.get_value(decode[2])
             r2 = decode[3]
             forward = cpu.is_spec_forward()
-            if decode[1] is 0x4:
+            if decode[1] == 0x4:
                 if r1 >= 0:
                     cpu.update_branch_pred(True, forward)
                     cpu.commit_fork("target")
