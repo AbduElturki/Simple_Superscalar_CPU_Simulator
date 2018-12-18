@@ -1,0 +1,101 @@
+;R14 RA
+;R15 SP
+;R2 Address
+;R3 Size - 1
+
+LDI R12 0
+LDI R2 0
+LDI R3 7
+
+;R11 CMP
+quick_sort:
+LDI R99 0
+CMP R11 R2 R3
+BEGZ R11 %exit
+
+SUBI R15 R15 5
+ST R14 R15
+STO R12 2 R15
+STO R2 3 R15
+STO R3 4 R15
+
+JAL %partition
+LDI R99 0
+LD R14 R15
+
+STO R0 1 R15 
+LDO R5 3 R15 
+SUBI R3  R0 1
+JAL %quick_sort
+LDI R99 0
+
+LD R14 R15 
+
+STO R1 1 R15
+LDO R2 4 R14
+SUBI R3 R1 1
+JAL %quick_sort
+LDI R99 0
+
+
+ADDI R15 R15 5
+LD R14 R15
+
+partition:
+MOV R1 R2
+MOV R9 R3
+
+LD R5 R9
+SUBI R9 R9 1
+
+LDI R10 -1
+
+loop:
+LDI R99 0
+CMP R11 R1 R9
+BGZ R11 %loop_end
+
+MOV R13 R12
+LD R4 R13
+
+CMP R11 R5 R4
+BEGZ R11 %incl
+
+incl_return:
+LDI R99 0
+ADDI R1 R1 1
+JI %loop
+
+loop_end:
+LDI R99 0
+JI %swap_p
+swap_p_return:
+MOV R0 R1 
+J R14
+
+incl:
+LDI R99 0
+ADDI R10 R10 1
+LD R7 R10
+
+MOV R13 R1
+LD R8 R13
+
+ST R7 R13
+ST R8 R10 
+JI %incl_return
+
+swap_p:
+LDI R99 0
+ADDI R10 R10 1
+LD R7 R10
+
+LD R8 R3
+
+ST R7 R3
+ST R8 R10
+JI %swap_p_return
+
+exit:
+LDI R99 0
+LDI R99 0

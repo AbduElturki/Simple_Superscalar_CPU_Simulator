@@ -17,6 +17,7 @@ class cpu(object):
         self.retire_his = {}
         self.WBR = {} 
         self.WBR_spec = {}
+        self.ra_flush = None
 
         self.instruct_buffer = deque(maxlen=8)
         self.instruct_fork = {"sequential" : deque(maxlen=8),
@@ -105,6 +106,10 @@ class cpu(object):
         self.rob.flush()
         self.fetch_unit.reset()
         self.spec_mem = defaultdict(int)
+        if self.ra_flush is not None:
+            self.new_dest("R14", self.ra_flush)
+            dest = self.get_dest("R14")
+            self.spec_flush = None
 
     def load_to_rs(self, decode, spec):
         self.execute_unit.load(decode, self, spec)
@@ -118,7 +123,7 @@ class cpu(object):
 
     def new_dest(self, reg, spec):
         if reg in self.reg:
-            self.rob.issue(reg, 00, False, spec)
+            self.rob.issue(reg, 00, False, spec, self)
             location = self.rob.tail - 1 if self.rob.tail else self.rob.size - 1
             self.rat[reg] = 'ROB' + str(location).zfill(2)
         else:

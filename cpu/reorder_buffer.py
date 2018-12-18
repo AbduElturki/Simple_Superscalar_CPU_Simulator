@@ -31,7 +31,7 @@ class reorder_buffer(object):
             if cpu.is_stalling():
                 cpu.stall_reset()
 
-    def issue(self, reg, value, valid, spec):
+    def issue(self, reg, value, valid, spec, cpu):
         if (self.tail + 1) % self.size is self.head:
             raise Exception("There should be stall here")
         else:
