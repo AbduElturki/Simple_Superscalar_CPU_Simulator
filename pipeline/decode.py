@@ -5,9 +5,9 @@ class decode_unit(object):
 
     def check_if_free(self, cpu, instruct):
         opcode = int(instruct[:2], 16)
-        if opcode in range(0x01, 0x0B) or opcode is 0x15:
+        if opcode in range(0x01, 0x0E) or opcode is 0x15:
             return cpu.is_unit_free("ALU")
-        elif opcode in range(0x10, 0x15):
+        elif opcode in range(0x10, 0x17):
             return cpu.is_unit_free("DT")
         elif opcode in range(0x20, 0x28):
             return cpu.is_unit_free("CF")
@@ -52,7 +52,7 @@ class decode_unit(object):
         if self.instruct_reg[0] < 0x00:
             raise Exception('Negative Operand')
         
-        elif self.instruct_reg[0] <= 0x0A or self.instruct_reg[0] == 0x15:
+        elif self.instruct_reg[0] <= 0x0D or self.instruct_reg[0] == 0x15:
             #Type-I ALU
             if self.instruct_reg[0] in [0x02, 0x0A]:
                 r2 = cpu.get_dest(r2)
@@ -90,10 +90,16 @@ class decode_unit(object):
                     decode = ["ALU", 0x7, r1, r2, r3]
                 elif self.instruct_reg[0] is 0x15: #MOV
                     decode = ["ALU", 0x0, r1, r3, 0]
+                elif self.instruct_reg[0] is 0x0B:
+                    decode = ["ALU", 0x8, r1, r2, r3]
+                elif self.instruct_reg[0] is 0x0C:
+                    decode = ["ALU", 0x9, r1, r2, r3]
+                elif self.instruct_reg[0] is 0x0D:
+                    decode = ["ALU", 0xA, r1, r2, r3]
                 else:
                     raise Exception("Tried to decode nonexistent Type R ALU opcode")
 
-        elif self.instruct_reg[0] <= 0x14:
+        elif self.instruct_reg[0] <= 0x17 and self.instruct_reg[0] is not 0x15:
             if self.instruct_reg[0] is 0x10: #LD
                 r3 = cpu.get_dest(r3)
                 cpu.new_dest(r1, spec)
@@ -116,6 +122,16 @@ class decode_unit(object):
                 cpu.new_dest(r1, spec)
                 r1 = cpu.get_dest(r1)
                 decode = ["DT", 0x4, r1, int(op[2], 16), r3]
+            elif self.instruct_reg[0] is 0x16: #LDO
+                r3 = cpu.get_dest(r3)
+                cpu.new_dest(r1, spec)
+                r1 = cpu.get_dest(r1)
+                decode = ["DT", 0x5, r1, r3]
+            elif self.instruct_reg[0] is 0x17: #LDO
+                r3 = cpu.get_dest(r3)
+                cpu.new_dest(r1, spec)
+                r1 = cpu.get_dest(r1)
+                decode = ["DT", 0x6, r1, r3]
             else:
                 raise Exception("Tried to decode nonexistent Data Transfer instruction") 
 

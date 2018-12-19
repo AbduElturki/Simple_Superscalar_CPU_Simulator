@@ -1,0 +1,20 @@
+LDI R1 5
+MOV R2 R1
+
+BZ R1 %zero
+
+loop:
+LDI R99 0
+SUBI R1 R1 1
+BZ R1 %exit
+MUL R3 R2 R1
+MOV R2 R3
+JI %loop
+
+zero:
+LDI R2 1
+LDI R3 1
+
+exit:
+LDI RZ 0
+LDI RZ 0

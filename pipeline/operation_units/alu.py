@@ -1,3 +1,4 @@
+import numpy as np
 from .op_unit import op_unit
 
 class alu_logic(op_unit):
@@ -32,6 +33,10 @@ class alu_logic(op_unit):
         elif decode[1] == 0x03: #DIV
             if self.clock == 3:
                 cpu.WBR[dest] = int(r2 / r3) if r3 else 0
+                cpu.new_dest("R16", self.spec)
+                dest = cpu.get_dest("R16")
+                cpu.update_reg(dest, (r2 % r3))
+                cpu.set_valid(dest)
                 cpu.instruct_per_cycle[cpu.cycle] += 1
                 self.clear()
             else:
@@ -52,5 +57,46 @@ class alu_logic(op_unit):
             cpu.WBR[dest] = -1 if r2 < r3 else 0 if r2 == r3 else 1
             cpu.instruct_per_cycle[cpu.cycle] += 1
             self.clear()
+        elif decode[1] == 0x08:
+            length = (cpu.get_length(decode[3]) if cpu.get_length(decode[3]) <=
+                      cpu.get_length(decode[4]) else cpu.get_length(decode[4]))
+            result = np.array([0]*64)
+            result = r2[:length] + r3[:length]
+            len_loc = cpu.get_length_location(dest)
+            cpu.new_dest(len_loc, self.spec)
+            new_len_loc = cpu.get_dest(len_loc) 
+            print(result)
+            cpu.WBR[new_len_loc] = length
+            cpu.WBR[dest] = result
+            cpu.instruct_per_cycle[cpu.cycle] += 1
+            self.clear()
+        elif decode[1] == 0x09:
+            length = (cpu.get_length(decode[3]) if cpu.get_length(decode[3]) <=
+                      cpu.get_length(decode[4]) else cpu.get_length(decode[4]))
+            result = np.array([0]*64)
+            result = r2[:length] - r3[:length]
+            len_loc = cpu.get_length_location(dest)
+            cpu.new_dest(len_loc, self.spec)
+            new_len_loc = cpu.get_dest(len_loc) 
+            cpu.WBR[new_len_loc] = length
+            cpu.WBR[dest] = result
+            cpu.instruct_per_cycle[cpu.cycle] += 1
+            self.clear()
+        elif decode[1] == 0x0A:
+            if self.clock == 1:
+                length = (cpu.get_length(r2) if cpu.get_length(r2) <=
+                          cpu.get_length(r3) else cpu.get_length(r3))
+                result = np.array([0]*64)
+                result = r2[:length] * r3[:length]
+                len_loc = cpu.get_length_location(dest)
+                cpu.new_dest(len_loc, self.spec)
+                new_len_loc = cpu.get_dest(len_loc) 
+                cpu.WBR[new_len_loc] = length
+                cpu.WBR[dest] = result
+                cpu.instruct_per_cycle[cpu.cycle] += 1
+                self.clear()
+            else:
+                self.clock += 1
+
         else:
             raise Exception(decode[0] +", " + decode[1] + ": doesn't exist in ALU")

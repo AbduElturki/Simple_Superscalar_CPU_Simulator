@@ -18,8 +18,9 @@ class fetch_unit(object):
         elif op == 0x23:
             if jal:
                 cpu.new_dest("R14", spec)
-                cpu.update_reg("R14", cpu.pc)
-                cpu.set_valid("R14")
+                dest = cpu.get_dest("R14")
+                cpu.update_reg(dest, cpu.pc)
+                cpu.set_valid(dest)
             elif not jal and spec:
                 cpu.ra_flush = cpu.pc
             target = int(instruct[2:], 16) 

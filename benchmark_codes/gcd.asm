@@ -1,0 +1,17 @@
+LDI R4 138 
+LDI R5 66
+
+MOV R2 R4
+MOV R3 R5
+
+loop:
+LDI R99 0
+BZ R3 %exit
+DIV R1 R2 R3
+MOV R2 R3
+MOV R3 R16
+JI %loop
+
+exit:
+LDI R99 0
+LDI R99 0

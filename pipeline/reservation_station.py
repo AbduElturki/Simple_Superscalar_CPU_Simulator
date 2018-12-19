@@ -157,13 +157,13 @@ class reservation_station(object):
                         cpu.get_valid(decode[3]), decode[4],
                         cpu.get_valid(decode[4]), 0]
         elif decode[0] is "DT":
-            if decode[1] == 0:
+            if decode[1] == 0 or decode[1] == 5 :
                 return [True, "DT", decode[1], decode[2], decode[3],
                         cpu.get_valid(decode[3]), 0, True, 0]
             elif decode[1] == 0x1:
                 return [True, "DT", decode[1], decode[2], decode[3],
                         True, 0, True, 0]
-            elif decode[1] == 0x2:
+            elif decode[1] == 0x2 or decode[1] == 0x6:
                 return [True, "DT", decode[1], 0, decode[2],
                         cpu.get_valid(decode[2]), decode[3],
                         cpu.get_valid(decode[3]), 0]

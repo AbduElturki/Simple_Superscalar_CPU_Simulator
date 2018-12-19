@@ -1,4 +1,6 @@
+import numpy as np
 import pandas as pd
+
 pd.options.mode.chained_assignment = None 
 
 class reorder_buffer(object):
@@ -17,6 +19,8 @@ class reorder_buffer(object):
         while head_row['valid'] and not head_row['spec']:
             reg = self.rob['reg'].iloc[self.head]
             value = self.rob['value'].iloc[self.head]
+            if type(value) is str:
+                value = cpu.string_2_array(value)
             rob = 'ROB' + str(self.head).zfill(2)
             cpu.reg[reg] = value
             cpu.sb[reg] = True
@@ -52,9 +56,15 @@ class reorder_buffer(object):
 
     def get_value(self, rob):
         return self.rob['value'].iloc[rob]
+
+    def get_reg(self, rob):
+        return self.rob['reg'].iloc[rob]
     
     def update_value(self, rob, update):
-        self.rob['value'].iloc[rob] = update
+        if type(update) is list or type(update) is np.ndarray:
+            self.rob['value'].iloc[rob] = np.array2string(np.array(update)) 
+        else:
+            self.rob['value'].iloc[rob] = update 
 
     def merge(self):
         self.rob['spec'] = [False] * self.size

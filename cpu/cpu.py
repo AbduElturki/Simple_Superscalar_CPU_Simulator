@@ -1,6 +1,7 @@
 import time
+import numpy as np
 
-from .memory import reg, rat, score_board
+from .memory import reg, rat, score_board, v_stride, v_len 
 from .reorder_buffer import reorder_buffer
 from collections import defaultdict, deque
 
@@ -13,6 +14,9 @@ class cpu(object):
         self.sb = score_board 
         self.rat = rat.copy()
         self.his_rat = rat.copy()
+        self.v_stride = v_stride.copy()
+        self.v_len = v_len.copy()
+
         self.rob = reorder_buffer(64)
         self.retire_his = {}
         self.WBR = {} 
@@ -109,6 +113,8 @@ class cpu(object):
         if self.ra_flush is not None:
             self.new_dest("R14", self.ra_flush)
             dest = self.get_dest("R14")
+            self.update_reg(dest, self.spec_flush)
+            self.set_valid(dest)
             self.spec_flush = None
 
     def load_to_rs(self, decode, spec):
@@ -152,13 +158,60 @@ class cpu(object):
             raise Exception("get_valid: dest doesn't exist")
         pass
 
+    def string_2_array(self, string):
+        no_brac = string[1:-1]
+        list_string = no_brac.split()
+        result = np.array([0] * 64)
+        to_add = np.array(list(map(int,list_string)))
+        result[:len(to_add)] = to_add
+        print(result)
+        return result 
+
     def get_value(self, dest):
         if dest in self.reg:
             return self.reg[dest]
         elif dest[:3] == "ROB":
-            return self.rob.rob['value'].iloc[int(dest[-2:])]
+            value = self.rob.rob['value'].iloc[int(dest[-2:])]
+            if type(value) is str:
+                return self.string_2_array(value)
+            else:
+                return value
         else:
             raise Exception("get_value: dest doesn't exist " + dest[:3])
+
+    def get_stride(self, vector):
+        if vector[:3] == "ROB":
+            vector_loc = self.rob.rob['reg'].iloc[int(vector[-2:])]
+        else:
+            vector_loc = vector
+        stride_loc = self.v_stride[vector_loc]
+        dest = self.get_dest(stride_loc)
+        return self.get_value(dest)
+
+
+    def get_length(self, vector):
+        if vector[:3] == "ROB":
+            vector_loc = self.rob.rob['reg'].iloc[int(vector[-2:])]
+        else:
+            vector_loc = vector
+        length_loc = self.v_len[vector_loc]
+        dest = self.get_dest(length_loc)
+        return self.get_value(dest)
+
+    def get_stride_location(self, vector):
+        if vector[:3] == "ROB":
+            vector_loc = self.rob.rob['reg'].iloc[int(vector[-2:])]
+        else:
+            vector_loc = vector
+        return self.v_stride[vector_loc]
+
+
+    def get_length_location(self, vector):
+        if vector[:3] == "ROB":
+            vector_loc = self.rob.rob['reg'].iloc[int(vector[-2:])]
+        else:
+            vector_loc = vector
+        return self.v_len[vector_loc]
 
     # Memory update
 
@@ -229,9 +282,11 @@ class cpu(object):
         print("| REG |  Value   | SB    |")
         print("|-----+----------+-------|")
         for reg in self.reg:
+            value = (lambda x: "Vector  " if type(self.reg[x]) is np.ndarray else
+                     str(self.reg[x]).zfill(8))
             border = "  |" if self.sb[reg] else " |"
             seperator = "  | " if len(reg) == 2 else " | "
-            print("| " + reg + seperator + str(self.reg[reg]).zfill(8) +
+            print("| " + reg + seperator + value(reg) +
                   " | " + str(self.sb[reg]) + border)
         print("---------------------------\n")
 
@@ -255,6 +310,7 @@ class cpu(object):
             print(self.instruct_fork['target'])
             print("*******************************\n")
             print(self.mem[:10])
+            print(self.mem[794:801])
         #    time.sleep(2)
         self.print_status()
         print(self.mem[:10])
@@ -285,6 +341,7 @@ class cpu(object):
             self.execute_unit.print_rs()
             self.rob.print_rob()
             print("*******************************\n")
+            print(len(self.reg["R17"]))
             print(self.mem[:10])
             inp = input('Continue?')
             con = False if inp is "n" else True
