@@ -149,7 +149,7 @@ class reservation_station(object):
 
     def decode_to_rs(self, decode, cpu):
         if decode[0] is "ALU":
-            if type(decode[4]) is int:
+            if type(decode[4]) is not str:
                 return [True, "ALU", decode[1], decode[2], decode[3],
                         cpu.get_valid(decode[3]), decode[4], True, 0]
             else:

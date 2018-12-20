@@ -18,6 +18,9 @@ class reorder_buffer(object):
         head_row = self.rob.iloc[self.head]
         while head_row['valid'] and not head_row['spec']:
             reg = self.rob['reg'].iloc[self.head]
+            if reg is None:
+                print(self.rob['value'].iloc[self.head])
+                raise Exception("None type Register")
             value = self.rob['value'].iloc[self.head]
             if type(value) is str:
                 value = cpu.string_2_array(value)
@@ -36,13 +39,10 @@ class reorder_buffer(object):
                 cpu.stall_reset()
 
     def issue(self, reg, value, valid, spec, cpu):
-        if (self.tail + 1) % self.size is self.head:
-            raise Exception("There should be stall here")
-        else:
-            self.rob.iloc[self.tail] = [reg, value, valid, spec]
-            self.tail = (self.tail + 1) % self.size 
-            if self.tail + 1 % self.size is self.head:
-                cpu.stall()
+        self.rob.iloc[self.tail] = [reg, value, valid, spec]
+        self.tail = (self.tail + 1) % self.size 
+        if self.tail + 1 % self.size is self.head:
+            cpu.stall()
 
     def print_rob(self):
         print("ROB")

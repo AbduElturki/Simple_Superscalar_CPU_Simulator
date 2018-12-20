@@ -32,6 +32,8 @@ class cpu(object):
         self.spec_mem = {} 
         self.mem = [0] * 1024
         self.mem[:8] = [102, 1, 4, 68, 6, 3, 9, 8]
+        self.mem[10:19] = [65, 3, 75, 102, 79, 88, 2, 1, 5]
+        self.mem[20:29] = [104, 42, 11, 9, 69, 88, 2, 34, 7]
         self.instruct_cache = instruct
 
         self.branch_predictor = branch_predictor
@@ -309,7 +311,9 @@ class cpu(object):
             print(self.instruct_fork['target'])
             print("*******************************\n")
             print(self.mem[:10])
-            print(self.mem[794:801])
+            print(self.mem[10:19])
+            print(self.mem[20:29])
+            print(self.mem[30:39])
         #    time.sleep(2)
         self.print_status()
         print(self.mem[:10])
@@ -340,8 +344,13 @@ class cpu(object):
             self.execute_unit.print_rs()
             self.rob.print_rob()
             print("*******************************\n")
-            print(len(self.reg["R17"]))
-            print(self.mem[:10])
+            print(self.rob.head)
+            print(self.rob.tail)
+            print(self.reg["R17"])
+            print(self.reg["R18"])
+            print(self.mem[10:19])
+            print(self.mem[20:29])
+            print(self.mem[30:39])
             inp = input('Continue?')
             con = False if inp is "n" else True
         self.print_status()

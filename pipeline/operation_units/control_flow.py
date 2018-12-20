@@ -30,6 +30,13 @@ class control_flow(op_unit):
                         cpu.spec_flush()
                 self.clear()
             elif decode[1] == 0x5:
+                print(r1)
+                print(r1)
+                print(r1)
+                print(r1)
+                print(r1)
+                print(r1)
+                print(r1)
                 if r1 < 0:
                     cpu.update_branch_pred(True, forward)
                     cpu.commit_fork("target")

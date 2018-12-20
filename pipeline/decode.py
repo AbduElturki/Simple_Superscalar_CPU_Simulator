@@ -5,7 +5,7 @@ class decode_unit(object):
 
     def check_if_free(self, cpu, instruct):
         opcode = int(instruct[:2], 16)
-        if opcode in range(0x01, 0x0E) or opcode is 0x15:
+        if opcode in range(0x01, 0x0F) or opcode is 0x15:
             return cpu.is_unit_free("ALU")
         elif opcode in range(0x10, 0x18) and opcode is not 0x15:
             return cpu.is_unit_free("DT")
@@ -52,7 +52,7 @@ class decode_unit(object):
         if self.instruct_reg[0] < 0x00:
             raise Exception('Negative Operand')
         
-        elif self.instruct_reg[0] <= 0x0D or self.instruct_reg[0] == 0x15:
+        elif self.instruct_reg[0] <= 0x0E or self.instruct_reg[0] == 0x15:
             #Type-I ALU
             if self.instruct_reg[0] in [0x02, 0x0A]:
                 r2 = cpu.get_dest(r2)
@@ -96,6 +96,8 @@ class decode_unit(object):
                     decode = ["ALU", 0x9, r1, r2, r3]
                 elif self.instruct_reg[0] is 0x0D:
                     decode = ["ALU", 0xA, r1, r2, r3]
+                elif self.instruct_reg[0] is 0x0E:
+                    decode = ["ALU", 0xB, r1, r2, r3]
                 else:
                     raise Exception("Tried to decode nonexistent Type R ALU opcode")
 

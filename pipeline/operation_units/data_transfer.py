@@ -14,7 +14,7 @@ class data_transfer(op_unit):
                     MAR = cpu.get_value(cpu.retire_his[MAR])
                 else:
                     MAR = cpu.get_value(MAR)
-                if cpu.is_speculative() and MAR in cpu.spec_mem:
+                if self.spec and MAR in cpu.spec_mem:
                     cpu.WBR[dest] = cpu.spec_mem[MAR]
                 else:
                     cpu.WBR[dest] = cpu.mem[MAR]
@@ -105,12 +105,13 @@ class data_transfer(op_unit):
                 read_from = (range(MAR, (MAR + end)))[::stride]
 
                 if self.spec: 
-                    raise Exception("")
+                    i = 0
                     for addr in read_from:
                         if addr in cpu.spec_mem:
-                            result = cpu.spec_mem[addr]
+                            result[i] = cpu.spec_mem[addr]
                         else:
-                            result = cpu.mem[addr]
+                            result[i] = cpu.mem[addr]
+                        i += 1
                 else:
                     result = cpu.mem[MAR:(MAR+end):stride]
                 cpu.WBR[dest] = result
@@ -122,7 +123,6 @@ class data_transfer(op_unit):
         elif decode[1] == 0x6: #ST
             if self.clock == 1:
                 dest = decode[2]
-                print(decode)
                 length = cpu.get_length(dest)
                 orig = cpu.get_value(decode[2])
                 MAR = cpu.get_value(decode[3])

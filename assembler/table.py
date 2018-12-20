@@ -17,6 +17,7 @@ opcode = {
     "VADD": 0x0B,
     "VSUB": 0x0C,
     "VMUL": 0x0D,
+    "VDOT": 0x0E,
     #LOAD/STORE
     "LD"  : 0x10, #Load REG[OP1] into DMEM[R2]
     "LDI" : 0x11, #Load l1 into DMEM[R2]

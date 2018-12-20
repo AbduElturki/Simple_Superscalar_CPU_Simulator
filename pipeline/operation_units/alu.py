@@ -15,6 +15,7 @@ class alu_logic(op_unit):
             r3 = decode[4]
         else:
             r3 = cpu.get_value(decode[4])
+
         if decode[1] == 0x00: #ADD 
             cpu.WBR[dest] = r2 + r3 
             cpu.instruct_per_cycle[cpu.cycle] += 1
@@ -35,8 +36,7 @@ class alu_logic(op_unit):
                 cpu.WBR[dest] = int(r2 / r3) if r3 else 0
                 cpu.new_dest("R16", self.spec)
                 dest = cpu.get_dest("R16")
-                cpu.update_reg(dest, (r2 % r3))
-                cpu.set_valid(dest)
+                cpu.WBR[dest] = r2 %r3
                 cpu.instruct_per_cycle[cpu.cycle] += 1
                 self.clear()
             else:
@@ -85,8 +85,8 @@ class alu_logic(op_unit):
             self.clear()
         elif decode[1] == 0x0A:
             if self.clock == 1:
-                length = (cpu.get_length(r2) if cpu.get_length(r2) <=
-                          cpu.get_length(r3) else cpu.get_length(r3))
+                length = (cpu.get_length(decode[3]) if cpu.get_length(decode[3]) <=
+                          cpu.get_length(decode[4]) else cpu.get_length(decode[4]))
                 result = np.array([0]*64)
                 result = r2[:length] * r3[:length]
                 len_loc = cpu.get_length_location(dest)
@@ -94,6 +94,17 @@ class alu_logic(op_unit):
                 new_len_loc = cpu.get_dest(len_loc) 
                 cpu.WBR[new_len_loc] = length
                 cpu.WBR[dest] = result
+                cpu.instruct_per_cycle[cpu.cycle] += 1
+                self.clear()
+            else:
+                self.clock += 1
+        elif decode[1] == 0x0B:
+            if self.clock == 2:
+                length = (cpu.get_length(decode[3]) if cpu.get_length(decode[3]) <=
+                          cpu.get_length(decode[4]) else cpu.get_length(decode[4]))
+                vector_1 = r2[:length] 
+                vector_2 = r3[:length] 
+                cpu.WBR[dest] = int(vector_1.dot(vector_2)) 
                 cpu.instruct_per_cycle[cpu.cycle] += 1
                 self.clear()
             else:
