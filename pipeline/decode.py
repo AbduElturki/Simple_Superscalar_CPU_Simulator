@@ -7,7 +7,7 @@ class decode_unit(object):
         opcode = int(instruct[:2], 16)
         if opcode in range(0x01, 0x0E) or opcode is 0x15:
             return cpu.is_unit_free("ALU")
-        elif opcode in range(0x10, 0x17):
+        elif opcode in range(0x10, 0x18) and opcode is not 0x15:
             return cpu.is_unit_free("DT")
         elif opcode in range(0x20, 0x28):
             return cpu.is_unit_free("CF")
@@ -128,9 +128,8 @@ class decode_unit(object):
                 r1 = cpu.get_dest(r1)
                 decode = ["DT", 0x5, r1, r3]
             elif self.instruct_reg[0] is 0x17: #LDO
-                r3 = cpu.get_dest(r3)
-                cpu.new_dest(r1, spec)
                 r1 = cpu.get_dest(r1)
+                r3 = cpu.get_dest(r3)
                 decode = ["DT", 0x6, r1, r3]
             else:
                 raise Exception("Tried to decode nonexistent Data Transfer instruction") 

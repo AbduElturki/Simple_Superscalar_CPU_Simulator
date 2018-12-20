@@ -24,8 +24,6 @@ def parse_operand(operand, labels):
     elif operand.startswith("R") or operand.startswith("V"):
         if operand.replace(",","") in register_aliases:
             operand = register_aliases[operand]
-            print(operand)
-        print(operand)
         return int(re.search(r'\d+',operand).group()) #extract int from string
     elif operand.startswith("0x"):
         return int(operand, 16)

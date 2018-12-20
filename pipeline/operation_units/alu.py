@@ -57,6 +57,7 @@ class alu_logic(op_unit):
             cpu.WBR[dest] = -1 if r2 < r3 else 0 if r2 == r3 else 1
             cpu.instruct_per_cycle[cpu.cycle] += 1
             self.clear()
+
         elif decode[1] == 0x08:
             length = (cpu.get_length(decode[3]) if cpu.get_length(decode[3]) <=
                       cpu.get_length(decode[4]) else cpu.get_length(decode[4]))
@@ -65,11 +66,11 @@ class alu_logic(op_unit):
             len_loc = cpu.get_length_location(dest)
             cpu.new_dest(len_loc, self.spec)
             new_len_loc = cpu.get_dest(len_loc) 
-            print(result)
             cpu.WBR[new_len_loc] = length
             cpu.WBR[dest] = result
             cpu.instruct_per_cycle[cpu.cycle] += 1
             self.clear()
+
         elif decode[1] == 0x09:
             length = (cpu.get_length(decode[3]) if cpu.get_length(decode[3]) <=
                       cpu.get_length(decode[4]) else cpu.get_length(decode[4]))

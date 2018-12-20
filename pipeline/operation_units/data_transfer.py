@@ -122,6 +122,7 @@ class data_transfer(op_unit):
         elif decode[1] == 0x6: #ST
             if self.clock == 1:
                 dest = decode[2]
+                print(decode)
                 length = cpu.get_length(dest)
                 orig = cpu.get_value(decode[2])
                 MAR = cpu.get_value(decode[3])

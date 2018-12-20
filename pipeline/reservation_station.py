@@ -185,9 +185,9 @@ class reservation_station(object):
         if rs['unit'] is "ALU":
             return ["ALU", rs['opcode'], rs['dest'], rs['op_1'], rs['op_2']]
         elif rs['unit'] is "DT":
-            if rs['opcode'] < 0x2:
+            if rs['opcode'] < 0x2 or rs['opcode'] == 5:
                 return ["DT", rs['opcode'], rs['dest'], rs['op_1']]
-            elif rs['opcode'] == 0x2:
+            elif rs['opcode'] == 0x2 or rs['opcode'] == 0x6:
                 return ["DT", rs['opcode'], rs['op_1'], rs['op_2']]
             elif rs['opcode'] == 0x3:
                 return ["DT", rs['opcode'], rs['op_1'], rs['offset'], rs['op_2']]

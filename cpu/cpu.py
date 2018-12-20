@@ -164,7 +164,6 @@ class cpu(object):
         result = np.array([0] * 64)
         to_add = np.array(list(map(int,list_string)))
         result[:len(to_add)] = to_add
-        print(result)
         return result 
 
     def get_value(self, dest):
