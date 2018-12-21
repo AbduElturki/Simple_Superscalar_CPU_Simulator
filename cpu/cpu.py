@@ -130,6 +130,8 @@ class cpu(object):
         return self.rat[reg]
 
     def new_dest(self, reg, spec):
+        if reg is None:
+            raise Exception('')
         if reg in self.reg:
             self.rob.issue(reg, 00, False, spec, self)
             location = self.rob.tail - 1 if self.rob.tail else self.rob.size - 1
@@ -277,6 +279,7 @@ class cpu(object):
                       self.correct_branching/self.branching * 100.00)
         print("IPC: " + str(ipc))
         print("Prediction Accuracy: " + str(percentage) + "%")
+        print("Total instruction: " + str(sum_instruct))
     
     def print_reg(self):
         print("--------------------------")

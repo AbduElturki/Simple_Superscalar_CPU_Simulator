@@ -90,7 +90,6 @@ class data_transfer(op_unit):
         if decode[1] == 0x5: #VLD
             if self.clock == 2:
                 dest = decode[2]
-                print(dest)
                 MAR = decode[3]
                 if dest in cpu.retire_his:
                     dest = cpu.retire_his[dest]

@@ -4,9 +4,9 @@ from .reservation_station import reservation_station
 class execute_unit(object):
     def __init__(self):
         self.busy = False
-        self.rs = {"ALU" : reservation_station([alu.alu_logic()] * 4, 16),
+        self.rs = {"ALU" : reservation_station([alu.alu_logic()] * 4, 12),
                    "DT"  : reservation_station([data_transfer.data_transfer()] * 2, 6),
-                   "CF"  : reservation_station([control_flow.control_flow()] * 2, 6)
+                   "CF"  : reservation_station([control_flow.control_flow()] * 1, 6)
                   }
 
     def is_free_space(self, unit):

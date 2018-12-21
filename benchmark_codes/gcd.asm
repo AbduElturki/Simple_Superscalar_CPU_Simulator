@@ -1,5 +1,5 @@
-LDI R4 138 
-LDI R5 66
+LDI R4 7584 
+LDI R5 4746 
 
 MOV R2 R4
 MOV R3 R5
@@ -13,5 +13,4 @@ MOV R3 R16
 JI %loop
 
 exit:
-LDI R99 0
 LDI R99 0

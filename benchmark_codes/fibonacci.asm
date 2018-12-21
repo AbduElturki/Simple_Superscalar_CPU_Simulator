@@ -1,6 +1,6 @@
 LDI R1 0
 LDI R2 1
-LDI R9 19 
+LDI R9 99 
 
 loop:
 LDI R99 0
@@ -12,5 +12,4 @@ SUBI R9 R9 1
 JI %loop
 
 exit:
-LDI R99 0
 LDI R99 0

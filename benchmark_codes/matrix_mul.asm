@@ -22,7 +22,7 @@ LDI R3 0
 LDI R5 0
 
 loop_2:
-LDI RZ 0
+LDI R99 0
 ADDI R12 R11 30
 CMP R9 R4 R5
 BZ R9 %loop_2_exit
@@ -40,6 +40,6 @@ ADDI R0 R0 3
 JI %loop
 
 exit:
-LDI RZ 0
-LDI RZ 0
+LDI R99 0
+
 

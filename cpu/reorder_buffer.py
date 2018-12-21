@@ -29,6 +29,7 @@ class reorder_buffer(object):
             cpu.sb[reg] = True
             cpu.update_rat(reg, reg)
             cpu.his_rat[reg] = reg
+            print(reg)
             cpu.rs_update_dest(rob, reg)
             cpu.retire_update(rob, reg)
             cpu.retire_his[rob] = reg
@@ -61,6 +62,8 @@ class reorder_buffer(object):
         return self.rob['reg'].iloc[rob]
     
     def update_value(self, rob, update):
+        if self.rob['reg'] is None:
+            raise Exception('')
         if type(update) is list or type(update) is np.ndarray:
             self.rob['value'].iloc[rob] = np.array2string(np.array(update)) 
         else:
