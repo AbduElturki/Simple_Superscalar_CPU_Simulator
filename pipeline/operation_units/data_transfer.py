@@ -90,9 +90,12 @@ class data_transfer(op_unit):
         if decode[1] == 0x5: #VLD
             if self.clock == 2:
                 dest = decode[2]
+                print(dest)
                 MAR = decode[3]
                 if dest in cpu.retire_his:
                     dest = cpu.retire_his[dest]
+                #length = 3
+                #stride = 3
                 length = cpu.get_length(dest)
                 stride = cpu.get_stride(dest)
                 end = length * stride
